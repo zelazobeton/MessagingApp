@@ -1,16 +1,17 @@
 package com.Server.test;
 
-import com.Server.src.ConnectionPortHandler;
-import org.junit.After;
+import com.Server.src.OpenSocketContext;
 
 import java.io.*;
+import java.net.Socket;
 
 import static org.junit.Assert.*;
 
-public class ConnectionPortHandlerTest {
-    private static ConnectionPortHandler sut;
+public class OpenSocketContextTest {
+    private static OpenSocketContext sut;
     private static StringWriter outputStringWriter;
     private static String stringToRead;
+    private static Socket socket;
 
     private static BufferedReader inputReader;
     private static PrintWriter printWriter;
@@ -19,7 +20,7 @@ public class ConnectionPortHandlerTest {
         inputReader = new BufferedReader(new StringReader(stringToRead));
         outputStringWriter = new StringWriter();
         printWriter = new PrintWriter(outputStringWriter, true);
-        sut = new ConnectionPortHandler(inputReader, printWriter);
+        sut = new OpenSocketContext(inputReader, printWriter, socket);
     }
 
     @org.junit.Test

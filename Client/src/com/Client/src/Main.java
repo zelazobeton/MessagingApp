@@ -22,7 +22,7 @@ public class Main {
             client.connect();
 
         }catch (IOException ex){
-            System.out.println("Client error" + ex.getMessage());
+            LOG.ERROR(ex.getMessage());
         }
     }
 }
