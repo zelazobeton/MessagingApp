@@ -1,4 +1,4 @@
-package com.example.Server;
+package com.Server.src;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,28 +11,31 @@ public class Main {
     private static final Integer CONNECTION_PORT = 5000;
 
     public static void main(String[] args) {
+        Socket socket;
         try(ServerSocket serverSocket = new ServerSocket(CONNECTION_PORT)){
-            Socket socket = serverSocket.accept();
-            BufferedReader input = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
-            PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+            socket = serverSocket.accept();
             try{
+                BufferedReader input = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream()));
+                PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
                 ConnectionPortHandler connectionPortHandler = new ConnectionPortHandler(input, output);
+                LOG.DEBUG("ConnectionPortHandler built successfully");
                 connectionPortHandler.scanForNewConnections();
             }
             catch (IOException ex){
-                System.out.println(ex.getMessage());
+                LOG.ERROR(ex.getMessage());
             }
             finally {
                 try{
                     socket.close();
+                    LOG.DEBUG("Server socket " + CONNECTION_PORT + " closed");
                 } catch (IOException ex){
-                    System.out.println(ex.getMessage());
+                    LOG.ERROR(ex.getMessage());
                 }
             }
         }
         catch (IOException ex){
-            ex.printStackTrace();
+            LOG.ERROR(ex.getMessage());
         }
     }
 }

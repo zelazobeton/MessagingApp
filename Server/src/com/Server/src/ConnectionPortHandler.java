@@ -1,4 +1,4 @@
-package com.example.Server;
+package com.Server.src;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,41 +8,37 @@ public class ConnectionPortHandler {
     private BufferedReader input;
     private PrintWriter output;
 
-    public ConnectionPortHandler(BufferedReader input, PrintWriter output) throws IOException {
+    public ConnectionPortHandler(BufferedReader input, PrintWriter output) {
         this.input = input;
         this.output = output;
     }
 
-    public void scanForNewConnections() throws IOException{
-        while(true) {
-            String connectString = input.readLine();
-            sleepToPreventTooQuickResponse();
+    public void scanForNewConnections(){
+        try{
+            while(true) {
+                String connectString = input.readLine();
+                sleepWithExceptionHandle();
 
-            if (connectString.equals("connect_1")) {
-                output.println("OK_1");
-                System.out.println(connectString);
-                break;
-            }
-            else {
-                System.out.println("Received wrong connect msg");
+                if (connectString != null && connectString.equals("connect_1")) {
+                    output.println("OK_1");
+                    LOG.DEBUG(connectString);
+                    break;
+                }
+                else {
+                    LOG.WRN("Received wrong connect msg");
+                }
             }
         }
-
-        while(true){
-            String echoString = input.readLine();
-            if(echoString.equals("exit")){
-                break;
-            }
-            sleepToPreventTooQuickResponse();
-            output.println("Echo: " + echoString);
+        catch (IOException ex){
+            LOG.ERROR(ex.getMessage());
         }
     }
 
-    private void sleepToPreventTooQuickResponse(){
+    private void sleepWithExceptionHandle(){
         try {
             Thread.sleep(200);
         } catch (InterruptedException ex) {
-            System.out.println("Thread interrupted");
+            LOG.WRN("Thread interrupted: " + ex.getMessage());
         }
     }
 }

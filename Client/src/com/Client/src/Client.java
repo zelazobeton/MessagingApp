@@ -1,9 +1,11 @@
-package com.example.Client;
+package com.Client.src;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Client {
     private BufferedReader serverReader;
@@ -35,20 +37,32 @@ public class Client {
     }
 
     public boolean connect(){
-        clientWriter.println("connect_1");
-        try{
-            String response = serverReader.readLine();
-            System.out.println(response);
-            if(response.equals("OK_1")){
-                return true;
+        Integer connectionId;
+//        connectionId = ThreadLocalRandom.current().nextInt(0, 1000);
+        connectionId = 1;
+        while(true){
+            try{
+                clientWriter.println("connect_" + connectionId);
+                String response = serverReader.readLine();
+                LOG.DEBUG("Received connection response: " + response);
+
+                if(response.equals("OK_" + connectionId)){
+//                    LOG.DEBUG("");
+                    return true;
+                }
+                sleepWithExceptionHandle(200);
             }
-            else{
-                return false;
+            catch (IOException ex){
+                LOG.ERROR(ex.getMessage());
             }
         }
-        catch (IOException ex){
-            System.out.println(ex.getMessage());
-            return false;
+    }
+
+    private void sleepWithExceptionHandle(Integer millisecondsToSleep){
+        try {
+            Thread.sleep(millisecondsToSleep);
+        } catch (InterruptedException ex) {
+            LOG.WRN("Thread interrupted");
         }
     }
 }
