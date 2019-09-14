@@ -11,6 +11,7 @@ public class Main {
     private static final Integer CONNECTION_PORT = 5000;
 
     public static void main(String[] args) {
+
         Socket socket;
         try(ServerSocket serverSocket = new ServerSocket(CONNECTION_PORT)){
             socket = serverSocket.accept();

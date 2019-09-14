@@ -3,16 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="46c09216-0889-4e43-9eea-67987c15b073" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/example/Client/Client.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/example/Client/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/Client.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/Client/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/Client/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/Server.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/Server.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/example/Server/ConnectionPortHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/example/Server/Echoer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/example/Server/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/ConnectionPortHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/ConnectionPortHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/Main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/ConnectionPortHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/ConnectionPortHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/Echoer.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/Echoer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/Main.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -53,10 +48,9 @@
     </option>
   </component>
   <component name="RunManager">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true">
+    <configuration name="Main" type="Application" factoryName="Application" singleton="false" temporary="true">
       <option name="MAIN_CLASS_NAME" value="com.Client.src.Main" />
       <module name="Client" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
       <method v="2">

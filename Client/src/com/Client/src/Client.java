@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 
 public class Client {
     private BufferedReader serverReader;
@@ -38,17 +39,20 @@ public class Client {
 
     public boolean connect(){
         Integer connectionId;
-//        connectionId = ThreadLocalRandom.current().nextInt(0, 1000);
-        connectionId = 1;
+        connectionId = ThreadLocalRandom.current().nextInt(1, 10);
+//        connectionId = 1;
         while(true){
             try{
                 clientWriter.println("connect_" + connectionId);
-                String response = serverReader.readLine();
-                LOG.DEBUG("Received connection response: " + response);
 
-                if(response.equals("OK_" + connectionId)){
-//                    LOG.DEBUG("");
-                    return true;
+                for(int idx = 0; idx < 10; idx++){
+                    String response = serverReader.readLine();
+                    LOG.DEBUG("Received connection response: " + response);
+                    if(isResponseToConnectionReq(response)){
+                        LOG.DEBUG("Received resp with verificationInt");
+                        return true;
+                    }
+                    sleepWithExceptionHandle(100);
                 }
                 sleepWithExceptionHandle(200);
             }
@@ -64,5 +68,9 @@ public class Client {
         } catch (InterruptedException ex) {
             LOG.WRN("Thread interrupted");
         }
+    }
+
+    private boolean isResponseToConnectionReq(String response){
+        return (response != null && Pattern.matches("OK_[0-9]_[0-9]", response));
     }
 }
