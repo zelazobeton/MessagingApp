@@ -6,9 +6,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class ClientManager {
+    private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     private final Integer CONNECTION_PORT;
     private final String HOST;
     private Socket socket;
@@ -29,10 +31,10 @@ public class ClientManager {
             connectToSocket();
             prepareReaderAndWriter();
             verifyUser();
-            LOG.DEBUG("User connected and verified");
+            LOGGER.fine("User connected and verified");
         }
         catch (IOException ex){
-            LOG.ERROR(ex.getMessage());
+            LOGGER.warning(ex.getMessage());
             closeSocket(socket);
         }
     }
@@ -51,17 +53,17 @@ public class ClientManager {
                 if(checkVerificationResponse(response)){
                     return;
                 }
-                LOG.WRN("Wrong verification response or no response");
+                LOGGER.info("Wrong verification response or no response");
             }
-            LOG.WRN("Verification failed, wait 1s");
+            LOGGER.info("Verification failed, wait 1s");
             sleepWithExceptionHandle(1000);
         }
     }
 
     private void getAndSendCredentials(){
-        LOG.DEBUG("Enter username: ");
+        LOGGER.fine("Enter username: ");
         String username = scanner.nextLine();
-        LOG.DEBUG("Enter password: ");
+        LOGGER.fine("Enter password: ");
         String pwd = scanner.nextLine();
         clientWriter.println(username);
         clientWriter.println(pwd);
@@ -70,7 +72,7 @@ public class ClientManager {
     private String getVerificationResponse() throws IOException{
         String response;
         for(int idx = 0; idx < 3; idx++){
-            LOG.DEBUG("Iteration " + idx + " to getVerificationResponse");
+            LOGGER.fine("Iteration " + idx + " to getVerificationResponse");
             response = serverReader.readLine();
             if(response != null && !response.equals("")){
                 return response;
@@ -92,7 +94,7 @@ public class ClientManager {
         try {
             Thread.sleep(millisecondsToSleep);
         } catch (InterruptedException ex) {
-            LOG.WRN("Thread interrupted");
+            LOGGER.info("Thread interrupted");
         }
     }
 
@@ -101,11 +103,11 @@ public class ClientManager {
             try{
                 socket = new Socket(HOST, CONNECTION_PORT);
                 socket.setSoTimeout(5000);
-                LOG.DEBUG("Socket successfully created");
+                LOGGER.fine("Socket successfully created");
                 return;
             }
             catch (IOException ex){
-                LOG.ERROR(ex.getMessage());
+                LOGGER.warning(ex.getMessage());
                 closeSocket(socket);
             }
         }
@@ -115,7 +117,7 @@ public class ClientManager {
         try{
             socket.close();
         } catch (Exception ex){
-            LOG.ERROR("No socket to close");
+            LOGGER.warning("No socket to close");
         }
     }
 }

@@ -10,8 +10,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.logging.Logger;
 
 public class SocketManager {
+    private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     private List<SocketContext> socketContexts;
     private Queue<SocketContext> contextsToVerify;
     private ServerSocket serverSocket;
@@ -39,13 +41,13 @@ public class SocketManager {
             serverSocket.setSoTimeout(5000);
         }
         catch (IOException ex){
-            LOG.ERROR(ex.getMessage());
+            LOGGER.warning(ex.getMessage());
             closeSocket();
         }
     }
 
     private void verifyWaitingSocket(){
-        LOG.DEBUG("verifyWaitingSocket");
+        LOGGER.fine("verifyWaitingSocket");
         SocketContext socketContext = contextsToVerify.poll();
         if(socketContext != null){
             if(socketContext.verifyConnection()){
@@ -60,17 +62,17 @@ public class SocketManager {
     private Socket connectSocket(){
         try{
             Socket socket = serverSocket.accept();
-            LOG.DEBUG("ServerSocket accepted");
+            LOGGER.fine("ServerSocket accepted");
             return socket;
         }
         catch (IOException ex) {
-            LOG.ERROR(ex.getMessage());
+            LOGGER.warning(ex.getMessage());
             return null;
         }
     }
 
     private boolean openNewSocketForWaitingClient(){
-        LOG.DEBUG("openNewSocketForWaitingClient");
+        LOGGER.fine("openNewSocketForWaitingClient");
         Socket socket = connectSocket();
         if(socket == null){
             return false;
@@ -85,7 +87,7 @@ public class SocketManager {
             return true;
         }
         catch (IOException ex){
-            LOG.ERROR(ex.getMessage());
+            LOGGER.warning(ex.getMessage());
             return false;
         }
     }
@@ -93,9 +95,9 @@ public class SocketManager {
     private void closeSocket(){
         try{
             this.serverSocket.close();
-            LOG.DEBUG("Server socket closed");
+            LOGGER.fine("Server socket closed");
         } catch (Exception ex){
-            LOG.ERROR(ex.getMessage());
+            LOGGER.warning(ex.getMessage());
         }
     }
 
@@ -103,7 +105,7 @@ public class SocketManager {
         try {
             Thread.sleep(millisecondsToSleep);
         } catch (InterruptedException ex) {
-            LOG.WRN("Thread interrupted: " + ex.getMessage());
+            LOGGER.info("Thread interrupted: " + ex.getMessage());
         }
     }
 }

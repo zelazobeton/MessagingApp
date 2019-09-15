@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Logger;
 
 public class SocketContext {
+    private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     private BufferedReader input;
     private PrintWriter output;
     private Socket socket;
@@ -21,17 +23,20 @@ public class SocketContext {
 
     public boolean verifyConnection(){
         try{
+            if(!input.ready()){
+                return false;
+            }
             String username = input.readLine();
-            LOG.DEBUG(username);
+            LOGGER.fine(username);
             String pwd = input.readLine();
-            LOG.DEBUG(pwd);
+            LOGGER.fine(pwd);
             connectionId = ThreadLocalRandom.current().nextInt(1, 10);
             output.println("OK_" + connectionId);
-            LOG.DEBUG("Connection verified");
+            LOGGER.fine("Connection verified");
             return true;
         }
         catch (IOException ex){
-            LOG.ERROR(ex.getMessage());
+            LOGGER.warning(ex.getMessage());
             return false;
         }
     }
