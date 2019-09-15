@@ -2,22 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46c09216-0889-4e43-9eea-67987c15b073" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../.diff.swp" beforeDir="false" afterPath="$PROJECT_DIR$/../.diff.swp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.diff.swp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/Client.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/Client.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/Client/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/ConnectionPortHandler.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/test/ConnectionPortHandlerTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/ConnectionPortHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/OpenSocketContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/OpenSocketContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/OpenSocketContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/test/OpenSocketContextTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/test/OpenSocketContextTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/test/ConnectionPortHandlerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/test/OpenSocketContextTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/OpenSocketContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/OpenSocketContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/test/OpenSocketContextTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/test/OpenSocketContextTest.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="Client" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -36,7 +41,7 @@
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../MultiThreading_ProducerConsumer" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Server" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -84,7 +89,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>

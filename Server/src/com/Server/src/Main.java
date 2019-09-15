@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
     private static final Integer CONNECTION_PORT = 5000;
@@ -17,6 +18,7 @@ public class Main {
         for(int idx = 0; idx < 5; idx++){
             openNewSocketIfWaiting(openSocketContexts);
         }
+
         LOG.DEBUG("End of process");
     }
 
@@ -25,14 +27,24 @@ public class Main {
         Socket socket = null;
         try(ServerSocket serverSocket = new ServerSocket(CONNECTION_PORT)){
             LOG.DEBUG("ServerSocket created successfully");
-            serverSocket.setSoTimeout(15000);
+            serverSocket.setSoTimeout(5000);
             socket = serverSocket.accept();
             LOG.DEBUG("ServerSocket accepted");
+
             BufferedReader input = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
             PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-            OpenSocketContext openSocketContext = new OpenSocketContext(input, output, socket);
-            openSocketContexts.add(openSocketContext);
+
+            if(verifyConnection(input)){
+                OpenSocketContext openSocketContext = new OpenSocketContext(input, output, socket);
+                openSocketContexts.add(openSocketContext);
+                sleepWithExceptionHandle(200);
+                Integer verificationInt = ThreadLocalRandom.current().nextInt(1, 10);
+                output.println("OK_" + verificationInt);
+            }
+            else{
+                throw new IOException("Connection not verified");
+            }
         }
         catch (IOException ex){
             LOG.ERROR(ex.getMessage());
@@ -44,6 +56,29 @@ public class Main {
             } catch (IOException socketCloseException){
                 LOG.ERROR(socketCloseException.getMessage());
             }
+        }
+    }
+
+    static void sleepWithExceptionHandle(Integer millisecondsToSleep){
+        try {
+            Thread.sleep(millisecondsToSleep);
+        } catch (InterruptedException ex) {
+            LOG.WRN("Thread interrupted: " + ex.getMessage());
+        }
+    }
+
+    static boolean verifyConnection(BufferedReader input){
+        try{
+            String username = input.readLine();
+            LOG.DEBUG(username);
+            String pwd = input.readLine();
+            LOG.DEBUG(pwd);
+            LOG.DEBUG("Connection verified");
+            return true;
+        }
+        catch (IOException ex){
+            LOG.ERROR(ex.getMessage());
+            return false;
         }
     }
 }

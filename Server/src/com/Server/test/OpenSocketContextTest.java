@@ -23,24 +23,15 @@ public class OpenSocketContextTest {
         sut = new OpenSocketContext(inputReader, printWriter, socket);
     }
 
-    @org.junit.Test
-    public void shouldWriteOkMsgToBufferAfterCorrectConnectInput() {
-        stringToRead = "connect_1";
-        sutCreate(stringToRead);
+//    @org.junit.Test
+//    public void shouldWriteOkMsgToBufferAfterCorrectConnectInput() {
+//        stringToRead = "connect_1";
+//        sutCreate(stringToRead);
+//
+//        sut.scanForNewConnections();
+//        String expectedString = String.format("OK_1%n");
+//        assertEquals(expectedString, outputStringWriter.toString());
+//    }
 
-        sut.scanForNewConnections();
 
-        String expectedString = String.format("OK_1%n");
-        assertEquals(expectedString, outputStringWriter.toString());
-    }
-
-    @org.junit.Test
-    public void shouldIgnoreIncorrectConnectInput() {
-        stringToRead = String.format("connection%n" + "lala%n" + "connect_1");
-        sutCreate(stringToRead);
-
-        sut.scanForNewConnections();
-        String expectedString = String.format("OK_1%n");
-        assertEquals(expectedString, outputStringWriter.toString());
-    }
 }

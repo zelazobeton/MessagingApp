@@ -3,7 +3,6 @@ package com.Client.src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
@@ -11,6 +10,7 @@ import java.util.regex.Pattern;
 public class Client {
     private BufferedReader serverReader;
     private PrintWriter clientWriter;
+    private Integer connectionId;
 
     public Client(PrintWriter clientWriter, BufferedReader serverReader) {
         this.serverReader = serverReader;
@@ -37,28 +37,20 @@ public class Client {
         } while(!echoString.equals("exit"));
     }
 
-    public boolean connect(){
-        Integer connectionId;
-        connectionId = ThreadLocalRandom.current().nextInt(1, 10);
-//        connectionId = 1;
+    public boolean verifyUser(){
+        Scanner scanner = new Scanner(System.in);
         while(true){
-            try{
-                clientWriter.println("connect_" + connectionId);
-
-                for(int idx = 0; idx < 10; idx++){
-                    String response = serverReader.readLine();
-                    LOG.DEBUG("Received connection response: " + response);
-                    if(isResponseToConnectionReq(response)){
-                        LOG.DEBUG("Received resp with verificationInt");
-                        return true;
-                    }
-                    sleepWithExceptionHandle(100);
+            getAndSendCredentials(scanner);
+            String response = getResponse();
+            if(response != null){
+                Integer connectionId = getConnectionId(response);
+                if(connectionId != null){
+                    this.connectionId = connectionId;
+                    return true;
                 }
-                sleepWithExceptionHandle(200);
             }
-            catch (IOException ex){
-                LOG.ERROR(ex.getMessage());
-            }
+            LOG.DEBUG("Verification failed, wait 1s");
+            sleepWithExceptionHandle(1000);
         }
     }
 
@@ -70,7 +62,41 @@ public class Client {
         }
     }
 
-    private boolean isResponseToConnectionReq(String response){
-        return (response != null && Pattern.matches("OK_[0-9]_[0-9]", response));
+    private Integer getConnectionId(String response){
+        if(Pattern.matches("OK_[0-9]", response)){
+            return (int) response.charAt(3);
+        }
+        return null;
+    }
+
+    private void getAndSendCredentials(Scanner scanner){
+        LOG.DEBUG("Enter username: ");
+        String username = scanner.nextLine();
+        LOG.DEBUG("Enter password: ");
+        String pwd = scanner.nextLine();
+        clientWriter.println(username);
+        clientWriter.println(pwd);
+    }
+
+    private String getResponse(){
+        String response = null;
+        for(int idx = 0; idx < 5; idx++){
+            try{
+                response = serverReader.readLine();
+                if(!response.equals(null) && !response.equals("")){
+                    LOG.DEBUG("Not empty verification response received: " + response);
+                    return response;
+                }
+            }
+            catch (IOException ex){
+                LOG.DEBUG("Verification response exception " + ex.getMessage());
+            }
+            sleepWithExceptionHandle(200);
+        }
+        return null;
+    }
+
+    public Integer getConnectionId() {
+        return connectionId;
     }
 }
