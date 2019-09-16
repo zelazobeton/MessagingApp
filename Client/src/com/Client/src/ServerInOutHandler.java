@@ -1,33 +1,23 @@
 package com.Client.src;
 
 import java.io.*;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
-public class TextFileInOutOperator implements IOutputInputOperator {
+public class ServerInOutHandler {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     private BufferedReader serverReader;
     private PrintWriter clientWriter;
-    private Scanner scanner;
 
-    public TextFileInOutOperator(InputStream inputStream, OutputStream outputStream) {
+    public ServerInOutHandler(InputStream inputStream, OutputStream outputStream) {
         this.serverReader = new BufferedReader(new InputStreamReader(inputStream));
         this.clientWriter = new PrintWriter(outputStream, true);
-        scanner = new Scanner(System.in);
     }
 
-    @Override
-    public void getAndSendCredentials() {
-        LOGGER.fine("Enter username: ");
-        String username = scanner.nextLine();
-        LOGGER.fine("Enter password: ");
-        String pwd = scanner.nextLine();
-        clientWriter.println(username);
-        clientWriter.println(pwd);
+    public void sendStringToServer(String outputString){
+        clientWriter.println(outputString);
     }
 
-    @Override
-    public String getVerificationResponse() throws IOException{
+    public String getResponseFromServer() throws IOException {
         String response;
         for(int idx = 0; idx < 3; idx++){
             LOGGER.fine("Iteration " + idx + " to getVerificationResponse");
