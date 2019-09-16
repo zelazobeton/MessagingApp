@@ -14,22 +14,20 @@ public class ClientManager {
     private final Integer CONNECTION_PORT;
     private final String HOST;
     private Socket socket;
-    private BufferedReader serverReader;
-    private PrintWriter clientWriter;
     private Integer connectionId;
-    Scanner scanner;
+    private IOutputInputOperator outputInputOperator;
 
     public ClientManager(String HOST, Integer CONNECTION_PORT) {
         this.CONNECTION_PORT = CONNECTION_PORT;
         this.HOST = HOST;
         this.socket = null;
-        scanner = new Scanner(System.in);
+        outputInputOperator = null;
     }
 
     public void run(){
         try{
             connectToSocket();
-            prepareReaderAndWriter();
+            prepareInOutOperator();
             verifyUser();
             LOGGER.fine("User connected and verified");
         }
@@ -39,16 +37,15 @@ public class ClientManager {
         }
     }
 
-    private void prepareReaderAndWriter() throws IOException{
-        this.serverReader = new BufferedReader(
-                new InputStreamReader(socket.getInputStream()));
-        this.clientWriter = new PrintWriter(socket.getOutputStream(), true);
+    private void prepareInOutOperator() throws IOException{
+        outputInputOperator = new TextFileInOutOperator(socket.getInputStream(),
+                                                        socket.getOutputStream());
     }
 
     private void verifyUser() throws IOException{
         while(true){
-            getAndSendCredentials();
-            String response = getVerificationResponse();
+            outputInputOperator.getAndSendCredentials();
+            String response = outputInputOperator.getVerificationResponse();
             if(response != null){
                 if(checkVerificationResponse(response)){
                     return;
@@ -58,28 +55,6 @@ public class ClientManager {
             LOGGER.info("Verification failed, wait 1s");
             sleepWithExceptionHandle(1000);
         }
-    }
-
-    private void getAndSendCredentials(){
-        LOGGER.fine("Enter username: ");
-        String username = scanner.nextLine();
-        LOGGER.fine("Enter password: ");
-        String pwd = scanner.nextLine();
-        clientWriter.println(username);
-        clientWriter.println(pwd);
-    }
-
-    private String getVerificationResponse() throws IOException{
-        String response;
-        for(int idx = 0; idx < 3; idx++){
-            LOGGER.fine("Iteration " + idx + " to getVerificationResponse");
-            response = serverReader.readLine();
-            if(response != null && !response.equals("")){
-                return response;
-            }
-            sleepWithExceptionHandle(200);
-        }
-        return null;
     }
 
     private boolean checkVerificationResponse(String response){

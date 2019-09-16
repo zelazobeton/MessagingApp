@@ -11,5 +11,4 @@ public class Main {
         socketManager.run();
         LOGGER.fine("End of process main");
     }
-
 }

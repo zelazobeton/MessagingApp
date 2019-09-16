@@ -4,20 +4,8 @@
     <list default="true" id="46c09216-0889-4e43-9eea-67987c15b073" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/ClientManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/ClientManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/LOG.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/Main.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/Client/src/LOG.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/Client/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/LOG.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/SocketContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/SocketContext.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/SocketManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/SocketManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/LOG.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../diff" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,6 +20,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JUnit4 Test Class" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -53,7 +42,7 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4" value="" />
     <property name="create.test.in.the.same.root" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Server" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">
