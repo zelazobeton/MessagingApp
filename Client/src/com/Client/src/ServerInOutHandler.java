@@ -8,9 +8,9 @@ public class ServerInOutHandler {
     private BufferedReader serverReader;
     private PrintWriter clientWriter;
 
-    public ServerInOutHandler(InputStream inputStream, OutputStream outputStream) {
+    public ServerInOutHandler(InputStream inputStream, PrintWriter clientWriter) {
         this.serverReader = new BufferedReader(new InputStreamReader(inputStream));
-        this.clientWriter = new PrintWriter(outputStream, true);
+        this.clientWriter = clientWriter;
     }
 
     public void sendStringToServer(String outputString){

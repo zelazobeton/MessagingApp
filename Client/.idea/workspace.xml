@@ -2,16 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46c09216-0889-4e43-9eea-67987c15b073" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/com/Client/src/ConsoleInOutHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/Client/src/IUserInOutHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/log.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/ClientManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/ClientManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/IOutputInputOperator.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/TextFileInOutOperator.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/ServerInOutHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/ServerInOutHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/UserContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/UserContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/Client/src/IOutputInputOperator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/Client/src/TextFileInOutOperator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ServerInOutHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ServerInOutHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/UserContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/UserContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/log.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />

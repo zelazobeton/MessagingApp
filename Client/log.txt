@@ -1,6 +1,0 @@
-wrz 16, 2019 10:13:33 AM com.Client.src.ClientManager connectToSocket
-FINE: Socket successfully created
-wrz 16, 2019 10:13:45 AM com.Client.src.ServerInOutHandler getResponseFromServer
-FINE: Iteration 0 to getVerificationResponse
-wrz 16, 2019 10:13:50 AM com.Client.src.ClientManager run
-WARNING: Read timed out

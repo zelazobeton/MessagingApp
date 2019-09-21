@@ -16,6 +16,7 @@ public class UserContext {
         this.connectionId = null;
     }
 
+
     public void getAndSendCredentials() {
         userInOutHandler.displayString("Enter username: ");
         String username = userInOutHandler.readString();
