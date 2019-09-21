@@ -17,18 +17,9 @@ public class UserContext {
     }
 
 
-    public void getAndSendCredentials() {
-        userInOutHandler.displayString("Enter username: ");
-        String username = userInOutHandler.readString();
-        userInOutHandler.displayString("Enter password: ");
-        String pwd = userInOutHandler.readString();
-        serverInOutHandler.sendStringToServer(username);
-        serverInOutHandler.sendStringToServer(pwd);
-    }
-
     void verifyUser() throws IOException {
         while(true){
-            getAndSendCredentials();
+//            getAndSendCredentials();
             String response = serverInOutHandler.getResponseFromServer();
             if(response != null){
                 if(checkVerificationResponse(response)){

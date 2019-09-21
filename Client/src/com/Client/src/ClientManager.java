@@ -27,9 +27,15 @@ public class ClientManager {
     public void run(){
         try{
             connectToSocket();
-            createUserContext();
-            userContext.verifyUser();
-            LOGGER.fine("User connected and verified");
+
+            this.clientWriter = new PrintWriter(socket.getOutputStream(), true);
+
+//            userContext = new UserContext(new ConsoleInOutHandler(),
+//                    new ServerInOutHandler(socket.getInputStream(),
+//                            clientWriter));
+//
+//            userContext.verifyUser();
+//            LOGGER.fine("User connected and verified");
 
             SendReceiveLoopMgr sendReceiveLoopMgr = new SendReceiveLoopMgr(socket.getInputStream(),
                                                                            userOutputBuffer);
@@ -41,13 +47,6 @@ public class ClientManager {
             LOGGER.warning(ex.getMessage());
             closeSocket(socket);
         }
-    }
-
-    private void createUserContext() throws IOException{
-        clientWriter = new PrintWriter(socket.getOutputStream(), true);
-        userContext = new UserContext(new ConsoleInOutHandler(),
-                                      new ServerInOutHandler(socket.getInputStream(),
-                                                             clientWriter));
     }
 
     private void connectToSocket(){

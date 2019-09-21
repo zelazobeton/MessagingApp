@@ -32,13 +32,29 @@ public class SendReceiveLoopMgr {
 
     private boolean tryHandleServerMsg() throws IOException {
         if(serverReader.ready()){
-            return handle(serverReader.readLine());
+            return handle(serverReader.readLine().split("_"));
         }
         return false;
     }
 
-    private boolean handle(String msg){
-        return true;
+    private boolean handle(String[] msgInParts){
+        LOGGER.warning("handle server msg: " + msgInParts[0]);
+        try {
+            switch (MsgTypes.valueOf(msgInParts[0])) {
+                case LoginReqMsg:
+                    userOutputBuffer.put("LoginReqMsg");
+                    return true;
+                case LoginSuccessInd:
+                    userOutputBuffer.put("LoginSuccessInd");
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        catch (IllegalArgumentException | InterruptedException ex){
+            LOGGER.warning(ex.toString());
+            return false;
+        }
     }
 
     public static void sleepWithExceptionHandle(Integer millisecondsToSleep){

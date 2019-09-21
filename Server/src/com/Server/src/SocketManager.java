@@ -14,24 +14,30 @@ import java.util.logging.Logger;
 
 public class SocketManager {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-    private List<SocketContext> socketContexts;
-    private Queue<SocketContext> contextsToVerify;
+    private List<SocketProcess> socketProcesses;
+    private Queue<SocketProcess> contextsToVerify;
     private ServerSocket serverSocket;
     private Integer CONNECTION_PORT;
+    private Integer numOfSocketsCreated;
 
     public SocketManager(Integer CONNECTION_PORT) {
         this.CONNECTION_PORT = CONNECTION_PORT;
-        socketContexts = new ArrayList<>();
+        socketProcesses = new ArrayList<>();
         contextsToVerify = new ArrayDeque<>();
         serverSocket = null;
+        numOfSocketsCreated = 0;
     }
 
     public boolean run(){
         openServerSocket();
         while(true){
-            openNewSocketForWaitingClient();
-            verifyWaitingSocket();
-            sleepWithExceptionHandle(1000);
+            try {
+                openNewSocketForWaitingClient();
+                sleepWithExceptionHandle(1000);
+            }
+            catch (IOException ex){
+                LOGGER.warning(ex.toString());
+            }
         }
     }
 
@@ -46,50 +52,18 @@ public class SocketManager {
         }
     }
 
-    private void verifyWaitingSocket(){
-        LOGGER.fine("verifyWaitingSocket");
-        SocketContext socketContext = contextsToVerify.poll();
-        if(socketContext != null){
-            if(socketContext.verifyConnection()){
-                return;
-            }
-            else{
-                contextsToVerify.add(socketContext);
-            }
-        }
-    }
-
-    private Socket connectSocket(){
-        try{
-            Socket socket = serverSocket.accept();
-            LOGGER.fine("ServerSocket accepted");
-            return socket;
-        }
-        catch (IOException ex) {
-            LOGGER.warning(ex.getMessage());
-            return null;
-        }
-    }
-
-    private boolean openNewSocketForWaitingClient(){
+    private void openNewSocketForWaitingClient() throws IOException{
         LOGGER.fine("openNewSocketForWaitingClient");
-        Socket socket = connectSocket();
-        if(socket == null){
-            return false;
-        }
-        try{
-            BufferedReader input = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
-            PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-            SocketContext socketContext = new SocketContext(input, output, socket);
-            socketContexts.add(socketContext);
-            contextsToVerify.add(socketContext);
-            return true;
-        }
-        catch (IOException ex){
-            LOGGER.warning(ex.getMessage());
-            return false;
-        }
+        Socket socket = serverSocket.accept();
+        LOGGER.fine("ServerSocket accepted");
+        BufferedReader input = new BufferedReader(
+                new InputStreamReader(socket.getInputStream()));
+        PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
+        SocketProcess socketProcess = new SocketProcess(input, output, socket, numOfSocketsCreated);
+        numOfSocketsCreated++;
+        socketProcesses.add(socketProcess);
+        socketProcess.run();
+//        contextsToVerify.add(socketContext);
     }
 
     private void closeSocket(){
