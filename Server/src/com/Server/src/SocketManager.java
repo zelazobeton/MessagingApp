@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLDataException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class SocketManager {
     private ServerSocket serverSocket;
     private Integer CONNECTION_PORT;
     private Integer numOfSocketsCreated;
+    private DbHandler dbHandler;
 
     public SocketManager(Integer CONNECTION_PORT) {
         this.CONNECTION_PORT = CONNECTION_PORT;
@@ -28,29 +30,40 @@ public class SocketManager {
         numOfSocketsCreated = 0;
     }
 
-    public boolean run(){
-        openServerSocket();
-        while(true){
-            try {
-                openNewSocketForWaitingClient();
-                sleepWithExceptionHandle(1000);
+    public void run() {
+        try{
+            openServerSocket();
+            openDatabase();
+            while(true){
+                try {
+                    openNewSocketForWaitingClient();
+                    sleepWithExceptionHandle(1000);
+                }
+                catch (IOException ex){
+                    LOGGER.warning(ex.toString());
+                }
             }
-            catch (IOException ex){
-                LOGGER.warning(ex.toString());
-            }
+        }
+        catch (Exception ex){
+            LOGGER.warning(ex.getMessage());
+            closeSocket();
+            dbHandler.closeConnection();
         }
     }
 
-    private void openServerSocket(){
-        try {
-            serverSocket = new ServerSocket(CONNECTION_PORT);
-            serverSocket.setSoTimeout(5000);
-        }
-        catch (IOException ex){
-            LOGGER.warning(ex.getMessage());
-            closeSocket();
+    private void openServerSocket() throws IOException{
+        serverSocket = new ServerSocket(CONNECTION_PORT);
+        serverSocket.setSoTimeout(5000);
+    }
+
+    private void openDatabase() throws Exception {
+        this.dbHandler = new DbHandler();
+        if(!dbHandler.open()){
+            throw new Exception("Could not open database");
         }
     }
+
+
 
     private void openNewSocketForWaitingClient() throws IOException{
         LOGGER.fine("openNewSocketForWaitingClient");
