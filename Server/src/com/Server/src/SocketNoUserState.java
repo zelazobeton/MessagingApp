@@ -28,7 +28,7 @@ public class SocketNoUserState extends SocketProcessState {
                     }
                 }
             }
-            super.socketProcess.sleepWithExceptionHandle(500);
+            super.socketProcess.sleepWithExceptionHandle(10000);
         }
     }
 }

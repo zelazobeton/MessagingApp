@@ -2,20 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46c09216-0889-4e43-9eea-67987c15b073" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/ClientManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/ClientManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/SendReceiveLoopMgr.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/SendReceiveLoopMgr.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/UIThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/UIThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/com/Client/src/UserContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/com/Client/src/UserContext.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/Client/src/SendReceiveLoopMgr.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/SendReceiveLoopMgr.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/Client/src/UIThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/UIThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/Client/src/UserContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/UserContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/log.txt.lck" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/SocketContext.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/SocketManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/out/production/Server/com/Server/src/SocketManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ConnectionManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ConsoleInOutHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/IUserInOutHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/MsgTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/MsgTypes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/SendReceiveLoopMgr.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ServerInOutHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/UIThread.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/UserContext.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketLoggedIdleState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketLoggedIdleState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketNoUserState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketNoUserState.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,9 +29,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JUnit4 Test Class" />
+        <option value="Enum" />
         <option value="Interface" />
         <option value="Class" />
-        <option value="Enum" />
       </list>
     </option>
   </component>
@@ -53,7 +52,7 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4" value="" />
     <property name="create.test.in.the.same.root" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../MultiThreading_ProducerConsumer" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../FirstProject" />
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">

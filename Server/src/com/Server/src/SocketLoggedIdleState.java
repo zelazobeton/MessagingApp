@@ -17,6 +17,9 @@ public class SocketLoggedIdleState extends SocketProcessState {
         while(true){
             LOGGER.fine("Running SocketLoggedIdleState");
             super.socketProcess.sleepWithExceptionHandle(2000);
+            super.socketProcess.sendMsgToClient("ConversationReqMsg_Requester");
+            super.socketProcess.sleepWithExceptionHandle(10000);
+
         }
     }
 }

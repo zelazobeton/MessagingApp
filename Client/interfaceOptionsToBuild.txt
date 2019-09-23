@@ -1,0 +1,8 @@
+ClientManagerLoginState
+LOG IN
+Enter username:
+
+ClientManagerLoggedInState
+Options:
+logout
+exit

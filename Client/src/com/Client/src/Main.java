@@ -8,8 +8,8 @@ public class Main {
     private static final String HOST = "localhost";
 
     public static void main(String[] args) {
-        ClientManager clientManager = new ClientManager(HOST, CONNECTION_PORT);
-        clientManager.run();
+        ConnectionManager connectionManager = new ConnectionManager(HOST, CONNECTION_PORT);
+        connectionManager.run();
     }
 }
 
