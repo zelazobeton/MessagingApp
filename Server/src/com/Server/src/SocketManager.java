@@ -1,12 +1,13 @@
 package com.Server.src;
 
+import com.Server.src.SocketProcessService.SocketProcess;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLDataException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class SocketManager {
         BufferedReader input = new BufferedReader(
                 new InputStreamReader(socket.getInputStream()));
         PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-        SocketProcess socketProcess = new SocketProcess(input, output, socket, numOfSocketsCreated);
+        SocketProcess socketProcess = new SocketProcess(dbHandler, input, output, socket, numOfSocketsCreated);
         numOfSocketsCreated++;
         socketProcesses.add(socketProcess);
         socketProcess.run();

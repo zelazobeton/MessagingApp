@@ -4,13 +4,26 @@ import java.util.logging.Logger;
 
 public class UserContext {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-    private Integer userId;
+    private int userId;
+    private String username;
+    private String pwd;
 
-    public UserContext(Integer userId, Integer socketProcessId) {
+    public UserContext(int userId, String username, String pwd) {
+        LOGGER.fine("UserContext created for username: " + username);
         this.userId = userId;
-        LOGGER.fine("SocketProcessId: " +
-                socketProcessId +
-                " userContext created for user: " +
-                userId);
+        this.username = username;
+        this.pwd = pwd;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPwd() {
+        return pwd;
     }
 }

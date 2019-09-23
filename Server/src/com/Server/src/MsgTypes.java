@@ -3,5 +3,11 @@ package com.Server.src;
 public enum MsgTypes {
     LoginReqMsg,
     LoginRespMsg,
-    LoginSuccessInd
+    RegisterReqMsg,
+    LoginSuccessInd,
+    RegisterSuccessInd,
+    RegisterFailInd,
+    LogoutReqMsg,
+    DeleteUserReqMsg, ClientExitInd,
+
 }

@@ -2,31 +2,26 @@ package com.Client.src.ClientManagerService;
 
 import com.Client.src.LoggerSingleton;
 import com.Client.src.MsgTypes;
-
 import java.util.logging.Logger;
 
-public class ClientManagerWaitForLoginRespState extends IClientManagerState {
+public class ClientManagerWaitForLogoutRespState extends IClientManagerState {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
 
-    public ClientManagerWaitForLoginRespState(ClientManager clientManager) {
+    public ClientManagerWaitForLogoutRespState(ClientManager clientManager) {
         super(clientManager);
-        LOGGER.fine("ClientManager set to: ClientManagerWaitForLoginRespState");
+        LOGGER.fine("ClientManager set to: ClientManagerWaitForLogoutRespState");
     }
 
     @Override
-    protected void handleMsgFromServer(String[] msgFromServer){
+    protected void handleMsgFromServer(String[] msgFromServer) {
         LOGGER.fine("handle server msg: " +
                 msgFromServer[0] +
                 " in state: " +
-                "ClientManagerWaitForLoginRespState");
+                "ClientManagerWaitForLogoutRespState");
         try {
             switch (MsgTypes.valueOf(msgFromServer[0])) {
-                case LoginSuccessInd:
-                    System.out.println("You are now logged in");
-                    super.clientManager.setState(new ClientManagerLoggedInState(super.clientManager));
-                    break;
-                case LoginFailInd:
-                    System.out.println("Incorrect username or password");
+                case LogoutRespMsg:
+                    System.out.println("You have successfully logged out");
                     super.clientManager.setState(new ClientManagerIdleState(super.clientManager));
                     break;
                 default:

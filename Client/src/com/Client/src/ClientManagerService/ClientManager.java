@@ -34,7 +34,39 @@ public class ClientManager {
     }
 
     public void run(){
+        runUserInputThread();
         setState(new ClientManagerIdleState(this));
+    }
+
+    public void prepareAndSendLoginRespMsg(){
+        stringBuilder.append("LoginRespMsg_");
+        appendCredentialsToStringBuilder();
+        clientWriter.println(stringBuilder.toString());
+        stringBuilder.setLength(0);
+    }
+
+    public void prepareAndSendRegisterReqMsg(){
+        stringBuilder.append("RegisterReqMsg_");
+        appendCredentialsToStringBuilder();
+        clientWriter.println(stringBuilder.toString());
+        stringBuilder.setLength(0);
+    }
+
+    private void appendCredentialsToStringBuilder(){
+        String userInput;
+        inputFromUserBuffer.clear();
+        System.out.println("Enter username: ");
+        while ((userInput = tryGetUserInput()) == null){
+            sleepWithExceptionHandle(200);
+        }
+        stringBuilder.append(userInput);
+        stringBuilder.append("_");
+
+        System.out.println("Enter password: ");
+        while ((userInput = tryGetUserInput()) == null){
+            sleepWithExceptionHandle(200);
+        }
+        stringBuilder.append(userInput);
     }
 
     public void printInterface(String interfaceId){

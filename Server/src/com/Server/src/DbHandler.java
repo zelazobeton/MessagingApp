@@ -1,7 +1,6 @@
 package com.Server.src;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 public class DbHandler {
@@ -29,10 +28,16 @@ public class DbHandler {
             "SELECT " + COLUMN_USER_ID + " FROM " + TABLE_USERS + " WHERE " +
             COLUMN_USER_NAME + " = ?";
 
+    public static final String QUERY_USER_USERNAME_PWD =
+            "SELECT " + COLUMN_USER_ID + ", " + COLUMN_USER_NAME + ", " + COLUMN_USER_PWD +
+            " FROM " + TABLE_USERS + " WHERE " +
+            COLUMN_USER_NAME + " = ? AND " + COLUMN_USER_PWD + " = ?";
+
 
 
     private PreparedStatement insertUserStmnt;
     private PreparedStatement queryUserStmnt;
+    private PreparedStatement queryUserWithPwdStmnt;
 
     private Connection conn;
 
@@ -42,6 +47,7 @@ public class DbHandler {
             createUserTable();
             insertUserStmnt = conn.prepareStatement(INSERT_USER);
             queryUserStmnt = conn.prepareStatement(QUERY_USER);
+            queryUserWithPwdStmnt = conn.prepareStatement(QUERY_USER_USERNAME_PWD);
             return true;
         }
         catch(SQLException ex){
@@ -58,6 +64,9 @@ public class DbHandler {
             if(queryUserStmnt != null){
                 queryUserStmnt.close();
             }
+            if(queryUserWithPwdStmnt != null){
+                queryUserWithPwdStmnt.close();
+            }
 
             if(conn != null){
                 conn.close();
@@ -70,12 +79,29 @@ public class DbHandler {
         }
     }
 
-    public UserData queryUserForUsername(String username){
+    public UserContext queryUserForUsernameAndPwd(String username, String pwd){
+        try{
+            queryUserWithPwdStmnt.setString(1, username);
+            queryUserWithPwdStmnt.setString(2, pwd);
+            ResultSet result = queryUserWithPwdStmnt.executeQuery();
+            if(result.isClosed()){
+                return null;
+            }
+            UserContext userContext = createUserDataFromQueryUserForUsername(result);
+            return userContext;
+        }
+        catch(SQLException ex){
+            LOGGER.warning("queryUserForUsernameAndPwd " + ex.getMessage());
+            return null;
+        }
+    }
+
+    public UserContext queryUserForUsername(String username){
         try{
             queryUserStmnt.setString(1, username);
             ResultSet result = queryUserStmnt.executeQuery();
-            UserData userData = createUserDataFromQueryUserForUsername(result);
-            return userData;
+            UserContext userContext = createUserDataFromQueryUserForUsername(result);
+            return userContext;
         }
         catch(SQLException ex){
             LOGGER.warning("queryUserForUsername " + ex.getMessage());
@@ -83,12 +109,12 @@ public class DbHandler {
         }
     }
 
-    private UserData createUserDataFromQueryUserForUsername(ResultSet result){
+    private UserContext createUserDataFromQueryUserForUsername(ResultSet result){
         try{
             final int userId = result.getInt(COLUMN_USER_ID);
             final String username = result.getString(COLUMN_USER_NAME);
             final String pwd = result.getString(COLUMN_USER_PWD);
-            return new UserData(userId, username, pwd);
+            return new UserContext(userId, username, pwd);
         }
         catch(SQLException ex){
             System.out.println("Exception thrown " + ex.getMessage());
@@ -108,7 +134,6 @@ public class DbHandler {
 
             insertUserStmnt.setString(1, username);
             insertUserStmnt.setString(2, pwd);
-            insertUserStmnt.executeUpdate();
 
             int affectedRows = insertUserStmnt.executeUpdate();
             if(affectedRows == 1){
@@ -134,8 +159,8 @@ public class DbHandler {
             LOGGER.fine("Performing rollback");
             conn.rollback();
         }
-        catch (SQLException ex2){
-            LOGGER.warning("Exception thrown during rollback");
+        catch (SQLException ex){
+            LOGGER.warning("Exception thrown during rollback" + ex.toString());
         }
     }
 

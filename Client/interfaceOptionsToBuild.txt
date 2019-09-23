@@ -1,6 +1,8 @@
-ClientManagerLoginState
-LOG IN
-Enter username:
+ClientManagerIdleState
+Options:
+login
+register
+exit
 
 ClientManagerLoggedInState
 Options:

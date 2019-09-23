@@ -2,7 +2,6 @@ package com.Client.src.ClientManagerService;
 
 import com.Client.src.LoggerSingleton;
 import com.Client.src.MsgTypes;
-
 import java.util.logging.Logger;
 
 public class ClientManagerIdleState extends IClientManagerState {
@@ -22,9 +21,6 @@ public class ClientManagerIdleState extends IClientManagerState {
                     "ClientManagerIdleState");
         try {
             switch (MsgTypes.valueOf(msgFromServer[0])) {
-                case LoginReqMsg:
-                    super.clientManager.setState(new ClientManagerLoginState(super.clientManager));
-                    break;
                 default:
                     return;
             }
@@ -36,6 +32,23 @@ public class ClientManagerIdleState extends IClientManagerState {
 
     @Override
     protected void handleUserInput(String userInput) {
+        switch(userInput){
+            case "login":
+                super.clientManager.prepareAndSendLoginRespMsg();
+                super.clientManager.setState(new ClientManagerWaitForLoginRespState(super.clientManager));
+                break;
+            case "register":
+                super.clientManager.prepareAndSendRegisterReqMsg();
+                super.clientManager.setState(new ClientManagerWaitForRegisterRespState(super.clientManager));
+                break;
+            case "exit":
+                LOGGER.fine("User exits program");
+                super.clientManager.clientWriter.println("ClientExitInd");
+                super.clientManager.sleepWithExceptionHandle(500);
+                System.exit(0);
+            default:
+                System.out.println("Incorrect input");
+        }
         return;
     }
 }

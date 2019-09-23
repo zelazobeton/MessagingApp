@@ -1,4 +1,8 @@
-package com.Server.src;
+package com.Server.src.SocketProcessService;
+
+import com.Server.src.DbHandler;
+import com.Server.src.LoggerSingleton;
+import com.Server.src.UserContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,8 +18,10 @@ public class SocketProcess {
     private UserContext userContext;
     private SocketProcessState currentState = null;
     private Integer socketProcessId;
+    private DbHandler dbHandler;
 
-    public SocketProcess(BufferedReader input, PrintWriter output, Socket socket, Integer socketProcessId) {
+    public SocketProcess(DbHandler dbHandler, BufferedReader input, PrintWriter output, Socket socket, Integer socketProcessId) {
+        this.dbHandler = dbHandler;
         this.input = input;
         this.output = output;
         this.socket = socket;
@@ -26,16 +32,44 @@ public class SocketProcess {
 
     public void run(){
         setState(new SocketNoUserState(this));
+        LOGGER.fine("socketProcessId: " + socketProcessId + " exits");
     }
 
-    public boolean verifyUser(String[] LoginRespMsgInParts){
-        String username = LoginRespMsgInParts[1];
-        String pwd = LoginRespMsgInParts[2];
-        LOGGER.fine("username: " + username);
-        LOGGER.fine("pwd: " + pwd);
-        LOGGER.fine("Connection verified");
-        return true;
+    public UserContext getUserDataFromDb(String username, String pwd){
+        synchronized (dbHandler){
+            return dbHandler.queryUserForUsernameAndPwd(username, pwd);
+        }
     }
+
+    public void handleLoginRespMsg(String[] msgInParts){
+        if((this.userContext = getUserDataFromDb(msgInParts[1], msgInParts[2])) != null){
+            LOGGER.fine("userId: " + userContext.getUserId() +
+                        " username: " + userContext.getUsername() +
+                        " pwd: " + userContext.getPwd());
+            LOGGER.fine("Connection verified");
+            sendMsgToClient("LoginSuccessInd");
+            setState(new SocketLoggedIdleState(this));
+        }
+        else {
+            sendMsgToClient("LoginFailInd");
+        }
+    }
+
+    public void handleRegisterReqMsg(String[] msgInParts) {
+        if(dbHandler.insertUser(msgInParts[1], msgInParts[2])){
+            LOGGER.fine("Successfully created user: " + msgInParts[1] + " pwd: " + msgInParts[2]);
+            sendMsgToClient("RegisterSuccessInd");
+        }
+        else {
+            LOGGER.fine("Registration for: " + msgInParts[1] + " pwd: " + msgInParts[2] + " failed");
+            sendMsgToClient("RegisterFailInd");
+        }
+    }
+
+    public void logoutUser() {
+        userContext = null;
+    }
+
 
     public String[] getMsgFromClient(){
         try{
@@ -72,9 +106,5 @@ public class SocketProcess {
     public void setState(SocketProcessState newState){
         currentState = newState;
         currentState.run();
-    }
-
-    public void createServerUserContextFromLoginRespMsg(String[] LoginRespMsgInParts){
-        userContext = new UserContext(999, getSocketProcessId());
     }
 }

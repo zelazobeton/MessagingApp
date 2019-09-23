@@ -37,14 +37,16 @@ public class ClientManagerLoggedInState extends IClientManagerState {
     protected void handleUserInput(String userInput) {
         switch (userInput){
             case "logout":
-                LOGGER.fine("User logout");
-                super.clientManager.clientWriter.println("LogoutReq");
-                super.clientManager.setState(new ClientManagerIdleState(super.clientManager));
+                super.clientManager.clientWriter.println("LogoutReqMsg");
+                super.clientManager.setState(new ClientManagerWaitForLogoutRespState(super.clientManager));
                 break;
             case "exit":
-                super.clientManager.clientWriter.println("LogoutReq");
+                super.clientManager.clientWriter.println("LogoutReqMsg");
+                super.clientManager.clientWriter.println("ClientExitInd");
                 LOGGER.fine("User exits program");
                 System.exit(0);
+            default:
+                System.out.println("Incorrect input");
         }
     }
 }

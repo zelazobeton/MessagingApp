@@ -5,12 +5,12 @@ import com.Client.src.MsgTypes;
 
 import java.util.logging.Logger;
 
-public class ClientManagerWaitForLoginRespState extends IClientManagerState {
+public class ClientManagerWaitForRegisterRespState extends IClientManagerState {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
 
-    public ClientManagerWaitForLoginRespState(ClientManager clientManager) {
+    public ClientManagerWaitForRegisterRespState(ClientManager clientManager) {
         super(clientManager);
-        LOGGER.fine("ClientManager set to: ClientManagerWaitForLoginRespState");
+        LOGGER.fine("ClientManager set to: ClientManagerWaitForRegisterRespState");
     }
 
     @Override
@@ -18,15 +18,13 @@ public class ClientManagerWaitForLoginRespState extends IClientManagerState {
         LOGGER.fine("handle server msg: " +
                 msgFromServer[0] +
                 " in state: " +
-                "ClientManagerWaitForLoginRespState");
+                "ClientManagerWaitForRegisterRespState");
         try {
             switch (MsgTypes.valueOf(msgFromServer[0])) {
-                case LoginSuccessInd:
-                    System.out.println("You are now logged in");
-                    super.clientManager.setState(new ClientManagerLoggedInState(super.clientManager));
-                    break;
-                case LoginFailInd:
-                    System.out.println("Incorrect username or password");
+                case RegisterSuccessInd:
+                    System.out.println("You have registered correctly. You can now log in.");
+                case RegisterFailInd:
+                    System.out.println("User exists or something else went wrong");
                     super.clientManager.setState(new ClientManagerIdleState(super.clientManager));
                     break;
                 default:
@@ -42,4 +40,5 @@ public class ClientManagerWaitForLoginRespState extends IClientManagerState {
     protected void handleUserInput(String userInput) {
         return;
     }
+
 }
