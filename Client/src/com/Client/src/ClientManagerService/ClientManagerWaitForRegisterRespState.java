@@ -23,6 +23,8 @@ public class ClientManagerWaitForRegisterRespState extends IClientManagerState {
             switch (MsgTypes.valueOf(msgFromServer[0])) {
                 case RegisterSuccessInd:
                     System.out.println("You have registered correctly. You can now log in.");
+                    super.clientManager.setState(new ClientManagerIdleState(super.clientManager));
+                    break;
                 case RegisterFailInd:
                     System.out.println("User exists or something else went wrong");
                     super.clientManager.setState(new ClientManagerIdleState(super.clientManager));

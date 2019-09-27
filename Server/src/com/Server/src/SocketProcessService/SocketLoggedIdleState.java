@@ -32,11 +32,17 @@ public class SocketLoggedIdleState extends SocketProcessState {
     public void handleMsgFromClient(String[] msgFromClient){
         switch (MsgTypes.valueOf(msgFromClient[0])){
             case LogoutReqMsg:
+                LOGGER.fine("LogoutReqMsg received in state SocketLoggedIdleState");
                 super.socketProcess.logoutUser();
                 super.socketProcess.sendMsgToClient("LogoutRespMsg");
                 super.socketProcess.setState(new SocketNoUserState(super.socketProcess));
                 break;
+            case ClientExitInd:
+                LOGGER.fine("ClientExitInd received in state SocketLoggedIdleState");
+                IS_RUNNING = false;
+                break;
             case DeleteUserReqMsg:
+                LOGGER.fine("DeleteUserReqMsg received in state SocketLoggedIdleState");
                 // TODO
                 break;
             default:

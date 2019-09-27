@@ -12,31 +12,32 @@ public class DbHandler {
 
     public static final String COLUMN_USER_ID = "userId";
     public static final String COLUMN_USER_NAME = "username";
-    public static final String COLUMN_USER_PWD = "pwd";
+    public static final String COLUMN_USER_HASH = "hash";
 
     public static final String CREATE_TABLE_USERS =
             "CREATE TABLE IF NOT EXISTS " + TABLE_USERS + " ( " +
             COLUMN_USER_ID + " INTEGER PRIMARY KEY, " +
             COLUMN_USER_NAME + " VARCHAR(50) NOT NULL, " +
-            COLUMN_USER_PWD + " VARCHAR(50) NOT NULL )";
+                    COLUMN_USER_HASH + " VARCHAR(50) NOT NULL )";
 
     public static final String INSERT_USER =
             "INSERT INTO " + TABLE_USERS + " (" + COLUMN_USER_NAME + ", " +
-                    COLUMN_USER_PWD + " ) VALUES(?, ?)";
+                    COLUMN_USER_HASH + " ) VALUES(?, ?)";
 
-    public static final String QUERY_USER =
-            "SELECT " + COLUMN_USER_ID + " FROM " + TABLE_USERS + " WHERE " +
+    public static final String QUERY_USER_FOR_USERNAME =
+            "SELECT " + COLUMN_USER_ID + ", " + COLUMN_USER_NAME + ", " + COLUMN_USER_HASH +
+            " FROM " + TABLE_USERS + " WHERE " +
             COLUMN_USER_NAME + " = ?";
 
     public static final String QUERY_USER_USERNAME_PWD =
-            "SELECT " + COLUMN_USER_ID + ", " + COLUMN_USER_NAME + ", " + COLUMN_USER_PWD +
+            "SELECT " + COLUMN_USER_ID + ", " + COLUMN_USER_NAME + ", " + COLUMN_USER_HASH +
             " FROM " + TABLE_USERS + " WHERE " +
-            COLUMN_USER_NAME + " = ? AND " + COLUMN_USER_PWD + " = ?";
+            COLUMN_USER_NAME + " = ? AND " + COLUMN_USER_HASH + " = ?";
 
 
 
     private PreparedStatement insertUserStmnt;
-    private PreparedStatement queryUserStmnt;
+    private PreparedStatement queryUserForUsernameStmnt;
     private PreparedStatement queryUserWithPwdStmnt;
 
     private Connection conn;
@@ -46,7 +47,7 @@ public class DbHandler {
             conn = DriverManager.getConnection(CONNECTION + DATABASE);
             createUserTable();
             insertUserStmnt = conn.prepareStatement(INSERT_USER);
-            queryUserStmnt = conn.prepareStatement(QUERY_USER);
+            queryUserForUsernameStmnt = conn.prepareStatement(QUERY_USER_FOR_USERNAME);
             queryUserWithPwdStmnt = conn.prepareStatement(QUERY_USER_USERNAME_PWD);
             return true;
         }
@@ -61,8 +62,8 @@ public class DbHandler {
             if(insertUserStmnt != null){
                 insertUserStmnt.close();
             }
-            if(queryUserStmnt != null){
-                queryUserStmnt.close();
+            if(queryUserForUsernameStmnt != null){
+                queryUserForUsernameStmnt.close();
             }
             if(queryUserWithPwdStmnt != null){
                 queryUserWithPwdStmnt.close();
@@ -79,15 +80,15 @@ public class DbHandler {
         }
     }
 
-    public UserContext queryUserForUsernameAndPwd(String username, String pwd){
+    public UserContext queryUserForUsernameAndHash(String username, String hash){
         try{
             queryUserWithPwdStmnt.setString(1, username);
-            queryUserWithPwdStmnt.setString(2, pwd);
+            queryUserWithPwdStmnt.setString(2, hash);
             ResultSet result = queryUserWithPwdStmnt.executeQuery();
-            if(result.isClosed()){
+            if(!result.isBeforeFirst()){
                 return null;
             }
-            UserContext userContext = createUserDataFromQueryUserForUsername(result);
+            UserContext userContext = createUserDataFromQueryResult(result);
             return userContext;
         }
         catch(SQLException ex){
@@ -98,9 +99,12 @@ public class DbHandler {
 
     public UserContext queryUserForUsername(String username){
         try{
-            queryUserStmnt.setString(1, username);
-            ResultSet result = queryUserStmnt.executeQuery();
-            UserContext userContext = createUserDataFromQueryUserForUsername(result);
+            queryUserForUsernameStmnt.setString(1, username);
+            ResultSet result = queryUserForUsernameStmnt.executeQuery();
+            if(!result.isBeforeFirst()){
+                return null;
+            }
+            UserContext userContext = createUserDataFromQueryResult(result);
             return userContext;
         }
         catch(SQLException ex){
@@ -109,31 +113,31 @@ public class DbHandler {
         }
     }
 
-    private UserContext createUserDataFromQueryUserForUsername(ResultSet result){
+    private UserContext createUserDataFromQueryResult(ResultSet result){
         try{
             final int userId = result.getInt(COLUMN_USER_ID);
             final String username = result.getString(COLUMN_USER_NAME);
-            final String pwd = result.getString(COLUMN_USER_PWD);
-            return new UserContext(userId, username, pwd);
+            final String hash = result.getString(COLUMN_USER_HASH);
+            return new UserContext(userId, username, hash);
         }
         catch(SQLException ex){
-            System.out.println("Exception thrown " + ex.getMessage());
+            LOGGER.warning(ex.toString());
             return null;
         }
     }
 
-    public boolean insertUser(String username, String pwd){
+    public boolean insertUser(String username, String hash){
         try {
             conn.setAutoCommit(false);
-            queryUserStmnt.setString(1, username);
-            ResultSet result = queryUserStmnt.executeQuery();
+            queryUserForUsernameStmnt.setString(1, username);
+            ResultSet result = queryUserForUsernameStmnt.executeQuery();
             if (result.next()) {
                 LOGGER.warning("DB ERROR: User already exists");
                 return false;
             }
 
             insertUserStmnt.setString(1, username);
-            insertUserStmnt.setString(2, pwd);
+            insertUserStmnt.setString(2, hash);
 
             int affectedRows = insertUserStmnt.executeUpdate();
             if(affectedRows == 1){

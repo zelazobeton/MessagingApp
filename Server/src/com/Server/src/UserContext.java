@@ -6,13 +6,13 @@ public class UserContext {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     private int userId;
     private String username;
-    private String pwd;
+    private String hash;
 
-    public UserContext(int userId, String username, String pwd) {
+    public UserContext(int userId, String username, String hash) {
         LOGGER.fine("UserContext created for username: " + username);
         this.userId = userId;
         this.username = username;
-        this.pwd = pwd;
+        this.hash = hash;
     }
 
     public int getUserId() {
@@ -23,7 +23,7 @@ public class UserContext {
         return username;
     }
 
-    public String getPwd() {
-        return pwd;
+    public String getHash() {
+        return hash;
     }
 }

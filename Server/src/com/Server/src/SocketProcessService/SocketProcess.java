@@ -2,6 +2,7 @@ package com.Server.src.SocketProcessService;
 
 import com.Server.src.DbHandler;
 import com.Server.src.LoggerSingleton;
+import com.Server.src.PasswordAuthentication;
 import com.Server.src.UserContext;
 
 import java.io.BufferedReader;
@@ -19,6 +20,7 @@ public class SocketProcess {
     private SocketProcessState currentState = null;
     private Integer socketProcessId;
     private DbHandler dbHandler;
+    private PasswordAuthentication pwdAuth;
 
     public SocketProcess(DbHandler dbHandler, BufferedReader input, PrintWriter output, Socket socket, Integer socketProcessId) {
         this.dbHandler = dbHandler;
@@ -27,6 +29,7 @@ public class SocketProcess {
         this.socket = socket;
         this.userContext = null;
         this.socketProcessId = socketProcessId;
+        this.pwdAuth = new PasswordAuthentication();
         LOGGER.fine("SocketProcessId: " + socketProcessId + " created");
     }
 
@@ -37,7 +40,11 @@ public class SocketProcess {
 
     public UserContext getUserDataFromDb(String username, String pwd){
         synchronized (dbHandler){
-            return dbHandler.queryUserForUsernameAndPwd(username, pwd);
+            UserContext userContext = dbHandler.queryUserForUsername(username);
+            if(userContext != null && pwdAuth.authenticate(pwd.toCharArray(), userContext.getHash())){
+                return userContext;
+            }
+            return null;
         }
     }
 
@@ -45,7 +52,7 @@ public class SocketProcess {
         if((this.userContext = getUserDataFromDb(msgInParts[1], msgInParts[2])) != null){
             LOGGER.fine("userId: " + userContext.getUserId() +
                         " username: " + userContext.getUsername() +
-                        " pwd: " + userContext.getPwd());
+                        " hash: " + userContext.getHash());
             LOGGER.fine("Connection verified");
             sendMsgToClient("LoginSuccessInd");
             setState(new SocketLoggedIdleState(this));
@@ -56,12 +63,13 @@ public class SocketProcess {
     }
 
     public void handleRegisterReqMsg(String[] msgInParts) {
-        if(dbHandler.insertUser(msgInParts[1], msgInParts[2])){
-            LOGGER.fine("Successfully created user: " + msgInParts[1] + " pwd: " + msgInParts[2]);
+        String hash = pwdAuth.hash(msgInParts[2].toCharArray());
+        if(dbHandler.insertUser(msgInParts[1], hash)){
+            LOGGER.fine("Successfully created user: " + msgInParts[1] + " hash: " + hash);
             sendMsgToClient("RegisterSuccessInd");
         }
         else {
-            LOGGER.fine("Registration for: " + msgInParts[1] + " pwd: " + msgInParts[2] + " failed");
+            LOGGER.fine("Registration for: " + msgInParts[1] + " hash: " + hash + " failed");
             sendMsgToClient("RegisterFailInd");
         }
     }
