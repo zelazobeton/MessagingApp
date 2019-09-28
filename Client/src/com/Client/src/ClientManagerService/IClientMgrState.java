@@ -4,32 +4,31 @@ import com.Client.src.LoggerSingleton;
 import com.Client.src.MsgTypes;
 import java.util.logging.Logger;
 
-public abstract class IClientManagerState {
+public abstract class IClientMgrState {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-    protected ClientManager clientManager;
+    protected ClientMgr clientMgr;
     private Integer cycleCounter;
 
-    public IClientManagerState(ClientManager clientManager) {
-        this.clientManager = clientManager;
+    public IClientMgrState(ClientMgr clientMgr) {
+        this.clientMgr = clientMgr;
         this.cycleCounter = 0;
         LOGGER.fine("ClientManager set to " + this.getClass().getSimpleName());
-        clientManager.printInterface(this.getClass().getSimpleName());
+        clientMgr.printInterface(this.getClass().getSimpleName());
     }
 
     public void run() {
         while(true){
-            clientManager.tryHandleUserInput();
-            clientManager.tryHandleMsgFromServer();
+            clientMgr.tryHandleUserInput();
+            clientMgr.tryHandleMsgFromServer();
             handleCyclicalEvents();
 
-
-            clientManager.sleepWithExceptionHandle(500);
+            clientMgr.sleepWithExceptionHandle(500);
         }
     }
 
     private void handleCyclicalEvents(){
-        if((cycleCounter % 5) == 0){
-            clientManager.sendMsgToServer(MsgTypes.ClientLiveConnectionInd);
+        if((cycleCounter % 80) == 0){
+            clientMgr.sendMsgToServer(MsgTypes.ClientLiveConnectionInd);
         }
         cycleCounter++;
     }

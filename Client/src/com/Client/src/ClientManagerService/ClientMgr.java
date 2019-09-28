@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 
-public class ClientManager {
+public class ClientMgr {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-    private IClientManagerState currentState = null;
+    private IClientMgrState currentState = null;
     private BufferedReader serverReader;
     public ArrayBlockingQueue<String> inputFromUserBuffer;
     public PrintWriter clientWriter;
@@ -18,8 +18,8 @@ public class ClientManager {
     public Thread userInputThread;
     public Map<String, List<String>> interfaceMap;
 
-    public ClientManager(InputStream inputStream,
-                         OutputStream outputStream)
+    public ClientMgr(InputStream inputStream,
+                     OutputStream outputStream)
     {
         this.serverReader = new BufferedReader(new InputStreamReader(inputStream));
         this.stringBuilder = new StringBuilder();
@@ -31,7 +31,7 @@ public class ClientManager {
 
     public void run(){
         runUserInputThread();
-        setState(new ClientManagerIdleState(this));
+        setState(new ClientMgrIdleState(this));
     }
 
     public void prepareAndSendLoginRespMsg(){
@@ -121,7 +121,7 @@ public class ClientManager {
         }
     }
 
-    public void setState(IClientManagerState newState){
+    public void setState(IClientMgrState newState){
         currentState = newState;
         currentState.run();
     }
@@ -144,6 +144,29 @@ public class ClientManager {
         if(msgFromServer != null){
             currentState.handleMsgFromServer(msgFromServer);
         }
+    }
+
+    public void startConversation(){
+        stringBuilder.append(MsgTypes.ConversationReqMsg);
+        String userInput;
+        inputFromUserBuffer.clear();
+        System.out.println("Who do you want to talk to?\nEnter username: ");
+        while ((userInput = tryGetUserInput()) == null){
+            sleepWithExceptionHandle(200);
+        }
+        stringBuilder.append(userInput);
+        sendMsgToServer(stringBuilder.toString());
+        stringBuilder.setLength(0);
+    }
+
+    public boolean handleConversationResp(String[] msgFromServer){
+        if(msgFromServer[1] != "OK"){
+            System.out.println("No such user or something went wrong");
+            setState(new ClientMgrLoggedInState(this));
+            return false;
+        }
+        setState(new ClientMgrConversationState(this));
+        return true;
     }
 }
 

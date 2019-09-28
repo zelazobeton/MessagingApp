@@ -1,6 +1,7 @@
 package com.Client.src;
 
-import com.Client.src.ClientManagerService.ClientManager;
+import com.Client.src.ClientManagerService.ClientMgr;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Logger;
@@ -20,10 +21,10 @@ public class ConnectionManager {
     public void run(){
         try{
             connectToSocket();
-            ClientManager clientManager = new ClientManager(socket.getInputStream(),
+            ClientMgr clientMgr = new ClientMgr(socket.getInputStream(),
                                                             socket.getOutputStream());
 
-            clientManager.run();
+            clientMgr.run();
         }
         catch (IOException ex){
             LOGGER.warning(ex.toString());

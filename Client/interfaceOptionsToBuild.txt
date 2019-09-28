@@ -1,11 +1,15 @@
-ClientManagerIdleState
+ClientMgrIdleState
 Options:
 login
 register
 exit
 
-ClientManagerLoggedInState
+ClientMgrLoggedInState
 Options:
+start (start a conversation)
 logout
 delete (deletes user)
 exit
+
+ClientMgrConversationState
+Type messages and press enter to send them:

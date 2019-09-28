@@ -19,5 +19,6 @@ public class MsgTypes {
 
     public static final String ClientLiveConnectionInd = "ClientLiveConnectionInd";
 
-    public static final String ConversationReqMsg = "ConversationReqMsg";
+    public static final String ConversationReqMsg = "ConversationReqMsg_";
+    public static final String ConversationRespMsg = "ConversationRespMsg";
 }
