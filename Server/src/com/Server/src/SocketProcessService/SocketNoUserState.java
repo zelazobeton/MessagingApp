@@ -12,27 +12,9 @@ public class SocketNoUserState extends ISocketProcessState {
     }
 
     @Override
-    public void run() {
-        int cycleCounter = 0;
-        while(IS_RUNNING)
-        {
-            if((cycleCounter % 10) == 0){
-                super.socketProcess.sendMsgToClient(MsgTypes.LoginReqMsg);
-            }
-
-            String[] msgFromClient = super.socketProcess.getMsgFromClient();
-            if(msgFromClient != null){
-                handleMsgFromClient(msgFromClient);
-            }
-
-            super.socketProcess.sleepWithExceptionHandle(500);
-            cycleCounter++;
-        }
-    }
-
-    public void handleMsgFromClient(String[] msgFromClient){
+    protected void handleMsg(String[] msgFromClient){
         LOGGER.fine("SocketProcessId: " + super.socketProcess.getSocketProcessId() +
-                    " received: " + msgFromClient[0] +
+                    " handle: " + msgFromClient[0] +
                     " in state " + this.getClass().getSimpleName());
         switch (msgFromClient[0]){
             case MsgTypes.LoginRespMsg:
@@ -45,6 +27,7 @@ public class SocketNoUserState extends ISocketProcessState {
                 IS_RUNNING = false;
                 break;
             default:
+                defaultMsgHandler(msgFromClient);
                 break;
         }
     }

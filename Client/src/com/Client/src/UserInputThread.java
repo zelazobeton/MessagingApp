@@ -12,11 +12,11 @@ public class UserInputThread implements Runnable {
     public UserInputThread(ArrayBlockingQueue<String> inputFromUserBuffer) {
         this.inputFromUserBuffer = inputFromUserBuffer;
         this.scanner = new Scanner(System.in);
-        LOGGER.fine("User input thread started");
     }
 
     @Override
     public void run() {
+        LOGGER.fine("User input thread started");
         while(true){
             String userInput = scanner.next();
             queueInput(userInput);

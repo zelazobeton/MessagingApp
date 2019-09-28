@@ -39,7 +39,7 @@ public class SocketManager {
                 sleepWithExceptionHandle(1000);
             }
             catch (IOException ex){
-                ex.printStackTrace();
+                LOGGER.warning(ex.toString());
             }
         }
     }

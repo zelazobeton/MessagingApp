@@ -1,7 +1,6 @@
 package com.Client.src;
 
 public class MsgTypes {
-    public static final String LoginReqMsg = "LoginReqMsg";
     public static final String LoginRespMsg = "LoginRespMsg_";
     public static final String LoginSuccessInd = "LoginSuccessInd";
     public static final String LoginFailInd = "LoginFailInd";
@@ -15,9 +14,10 @@ public class MsgTypes {
     public static final String ClientExitInd = "ClientExitInd";
 
     public static final String DeleteUserReqMsg = "DeleteUserReqMsg";
-    public static final String DeleteUserRespMsg = "DeleteUserRespMsg";
     public static final String DeleteUserFailInd = "DeleteUserFailInd";
     public static final String DeleteUserSuccessInd = "DeleteUserSuccessInd";
+
+    public static final String ClientLiveConnectionInd = "ClientLiveConnectionInd";
 
     public static final String ConversationReqMsg = "ConversationReqMsg";
 }

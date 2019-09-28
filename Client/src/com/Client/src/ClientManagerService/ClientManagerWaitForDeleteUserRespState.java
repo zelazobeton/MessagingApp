@@ -2,7 +2,6 @@ package com.Client.src.ClientManagerService;
 
 import com.Client.src.LoggerSingleton;
 import com.Client.src.MsgTypes;
-
 import java.util.logging.Logger;
 
 public class ClientManagerWaitForDeleteUserRespState extends IClientManagerState{

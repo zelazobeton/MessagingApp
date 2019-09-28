@@ -17,4 +17,7 @@ public class MsgTypes {
     public static final String DeleteUserReqMsg = "DeleteUserReqMsg";
     public static final String DeleteUserFailInd = "DeleteUserFailInd";
     public static final String DeleteUserSuccessInd = "DeleteUserSuccessInd";
+
+    public static final String NoResponseTimerExpired = "NoResponseTimerExpired";
+    public static final String ClientLiveConnectionInd = "ClientLiveConnectionInd";
 }

@@ -1,6 +1,7 @@
 package com.Server.src.SocketProcessService;
 
 import com.Server.src.LoggerSingleton;
+import com.Server.src.MsgTypes;
 
 import java.util.logging.Logger;
 
@@ -16,5 +17,28 @@ public abstract class ISocketProcessState {
                 " set to " + this.getClass().getSimpleName());
     }
 
-    public abstract void run();
+    protected abstract void handleMsg(String[] msgFromClient);
+
+    public void run() {
+        while(IS_RUNNING){
+            socketProcess.tryGetMsgFromClient();
+            socketProcess.tryHandleNextMsgFromQueue();
+
+            socketProcess.sleepWithExceptionHandle(500);
+        }
+    }
+
+    protected void defaultMsgHandler(String[] msgFromQueue){
+        switch (msgFromQueue[0]){
+            case MsgTypes.ClientLiveConnectionInd:
+                socketProcess.resetNoResponseTimer();
+                break;
+            case MsgTypes.NoResponseTimerExpired:
+                socketProcess.logoutUser();
+                IS_RUNNING = false;
+                break;
+            default:
+                break;
+        }
+    }
 }

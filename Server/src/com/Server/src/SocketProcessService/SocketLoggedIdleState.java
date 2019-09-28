@@ -12,22 +12,9 @@ public class SocketLoggedIdleState extends ISocketProcessState {
     }
 
     @Override
-    public void run() {
-        while(IS_RUNNING){
-//            LOGGER.fine("Running SocketLoggedIdleState");
-
-            String[] msgFromClient = super.socketProcess.getMsgFromClient();
-            if(msgFromClient != null){
-                handleMsgFromClient(msgFromClient);
-            }
-
-            super.socketProcess.sleepWithExceptionHandle(500);
-        }
-    }
-
-    public void handleMsgFromClient(String[] msgFromClient){
+    protected void handleMsg(String[] msgFromClient){
         LOGGER.fine("SocketProcessId: " + super.socketProcess.getSocketProcessId() +
-                    " received: " + msgFromClient[0] +
+                    " handle: " + msgFromClient[0] +
                     " in state " + this.getClass().getSimpleName());
         switch (msgFromClient[0]){
             case MsgTypes.LogoutReqMsg:

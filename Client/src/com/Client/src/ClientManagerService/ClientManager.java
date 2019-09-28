@@ -131,5 +131,19 @@ public class ClientManager {
                     " in state: " + currentState.getClass().getSimpleName());
         clientWriter.println(msg);
     }
+
+    public void tryHandleUserInput(){
+        String userInput;
+        while ((userInput = tryGetUserInput()) != null){
+            currentState.handleUserInput(userInput);
+        }
+    }
+
+    public void tryHandleMsgFromServer(){
+        String[] msgFromServer = tryGetServerMsg();
+        if(msgFromServer != null){
+            currentState.handleMsgFromServer(msgFromServer);
+        }
+    }
 }
 

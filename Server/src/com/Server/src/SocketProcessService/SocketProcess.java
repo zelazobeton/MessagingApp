@@ -6,10 +6,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 
 public class SocketProcess {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
+    private ArrayBlockingQueue<String> messageQueue;
     private BufferedReader input;
     private PrintWriter output;
     private Socket socket;
@@ -18,6 +20,7 @@ public class SocketProcess {
     private Integer socketProcessId;
     private DbHandler dbHandler;
     private PasswordAuthentication pwdAuth;
+    private Thread noResponseTimer;
 
     public SocketProcess(DbHandler dbHandler, BufferedReader input, PrintWriter output, Socket socket, Integer socketProcessId) {
         this.dbHandler = dbHandler;
@@ -27,10 +30,14 @@ public class SocketProcess {
         this.userContext = null;
         this.socketProcessId = socketProcessId;
         this.pwdAuth = new PasswordAuthentication();
+        this.messageQueue = new ArrayBlockingQueue<>(30);
+        this.noResponseTimer = new Thread(new NoResponseTimerThread(messageQueue));
+
         LOGGER.fine("SocketProcessId: " + socketProcessId + " created");
     }
 
     public void run(){
+        noResponseTimer.start();
         setState(new SocketNoUserState(this));
         LOGGER.fine("socketProcessId: " + socketProcessId + " exits");
     }
@@ -76,20 +83,28 @@ public class SocketProcess {
     }
 
 
+    public void tryGetMsgFromClient(){
+        try{
+            if(input.ready()){
+                messageQueue.put(input.readLine());
+            }
+        }
+        catch (IOException | InterruptedException ex){
+            ex.printStackTrace();
+        }
+    }
+
     public String[] getMsgFromClient(){
         try{
-            if(!input.ready()){
-                return null;
-            }
-            else {
+            if(input.ready()){
                 String[] msgInParts = input.readLine().split("_");
                 return msgInParts;
             }
         }
         catch (IOException ex){
             ex.printStackTrace();
-            return null;
         }
+        return null;
     }
 
     public void sendMsgToClient(String msg){
@@ -123,5 +138,28 @@ public class SocketProcess {
         logoutUser();
         sendMsgToClient(MsgTypes.DeleteUserSuccessInd);
         setState(new SocketNoUserState(this));
+    }
+
+    public String[] getNextMsgFromQueue(){
+        if(!messageQueue.isEmpty()){
+            try{
+                return messageQueue.take().split("_");
+            }
+            catch (InterruptedException ex){
+                LOGGER.warning("Exception thrown while getNextMsgFromQueue: " + ex.toString());
+            }
+        }
+        return null;
+    }
+
+    public void tryHandleNextMsgFromQueue(){
+        String[] msgToHandle = getNextMsgFromQueue();
+        if(msgToHandle != null) {
+            currentState.handleMsg(msgToHandle);
+        }
+    }
+
+    public void resetNoResponseTimer(){
+        noResponseTimer.interrupt();
     }
 }
