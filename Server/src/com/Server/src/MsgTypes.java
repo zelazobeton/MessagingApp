@@ -12,9 +12,9 @@ public class MsgTypes {
 
     public static final String LogoutReqMsg = "LogoutReqMsg";
     public static final String LogoutRespMsg = "LogoutRespMsg";
-    public static final String DeleteUserReqMsg = "DeleteUserReqMsg";
     public static final String ClientExitInd = "ClientExitInd";
 
+    public static final String DeleteUserReqMsg = "DeleteUserReqMsg";
     public static final String DeleteUserFailInd = "DeleteUserFailInd";
     public static final String DeleteUserSuccessInd = "DeleteUserSuccessInd";
 }

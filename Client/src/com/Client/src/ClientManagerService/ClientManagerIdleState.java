@@ -9,24 +9,21 @@ public class ClientManagerIdleState extends IClientManagerState {
 
     public ClientManagerIdleState(ClientManager clientManager) {
         super(clientManager);
-        super.clientManager.printInterface("ClientManagerIdleState");
-        LOGGER.fine("ClientManager set to: ClientManagerIdleState");
     }
 
     @Override
     protected void handleMsgFromServer(String[] msgFromServer){
-        LOGGER.fine("handle server msg: " +
-                    msgFromServer[0] +
-                    " in state: " +
-                    "ClientManagerIdleState");
+        LOGGER.fine("Client received: " + msgFromServer[0] +
+                " in state " + this.getClass().getSimpleName());
         try {
-            switch (MsgTypes.valueOf(msgFromServer[0])) {
+            switch (msgFromServer[0]) {
                 default:
                     return;
             }
         }
         catch (IllegalArgumentException ex){
             LOGGER.warning(ex.toString());
+            ex.printStackTrace();
         }
     }
 
@@ -42,8 +39,7 @@ public class ClientManagerIdleState extends IClientManagerState {
                 super.clientManager.setState(new ClientManagerWaitForRegisterRespState(super.clientManager));
                 break;
             case "exit":
-                LOGGER.fine("User exits program");
-                super.clientManager.clientWriter.println("ClientExitInd");
+                super.clientManager.sendMsgToServer(MsgTypes.ClientExitInd);
                 super.clientManager.sleepWithExceptionHandle(500);
                 System.exit(0);
             default:

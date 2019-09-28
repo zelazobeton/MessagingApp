@@ -4,12 +4,12 @@ import com.Server.src.LoggerSingleton;
 
 import java.util.logging.Logger;
 
-public abstract class SocketProcessState {
+public abstract class ISocketProcessState {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     protected SocketProcess socketProcess;
     protected boolean IS_RUNNING = true;
 
-    public SocketProcessState(SocketProcess socketProcess) {
+    public ISocketProcessState(SocketProcess socketProcess) {
         this.socketProcess = socketProcess;
         LOGGER.fine("SocketProcessId: " +
                 socketProcess.getSocketProcessId() +

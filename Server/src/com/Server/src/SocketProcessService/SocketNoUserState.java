@@ -4,7 +4,7 @@ import com.Server.src.LoggerSingleton;
 import com.Server.src.MsgTypes;
 import java.util.logging.Logger;
 
-public class SocketNoUserState extends SocketProcessState {
+public class SocketNoUserState extends ISocketProcessState {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
 
     public SocketNoUserState(SocketProcess socketProcess) {

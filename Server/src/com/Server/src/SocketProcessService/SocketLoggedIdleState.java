@@ -4,7 +4,7 @@ import com.Server.src.LoggerSingleton;
 import com.Server.src.MsgTypes;
 import java.util.logging.Logger;
 
-public class SocketLoggedIdleState extends SocketProcessState {
+public class SocketLoggedIdleState extends ISocketProcessState {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
 
     public SocketLoggedIdleState(SocketProcess socketProcess) {
@@ -36,6 +36,7 @@ public class SocketLoggedIdleState extends SocketProcessState {
                 super.socketProcess.setState(new SocketNoUserState(super.socketProcess));
                 break;
             case MsgTypes.ClientExitInd:
+                super.socketProcess.logoutUser();
                 IS_RUNNING = false;
                 break;
             case MsgTypes.DeleteUserReqMsg:

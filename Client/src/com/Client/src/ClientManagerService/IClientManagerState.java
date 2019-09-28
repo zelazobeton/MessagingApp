@@ -9,6 +9,8 @@ public abstract class IClientManagerState {
 
     public IClientManagerState(ClientManager clientManager) {
         this.clientManager = clientManager;
+        LOGGER.fine("ClientManager set to " + this.getClass().getSimpleName());
+        clientManager.printInterface(this.getClass().getSimpleName());
     }
 
     public void run() {

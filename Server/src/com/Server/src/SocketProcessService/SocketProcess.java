@@ -14,7 +14,7 @@ public class SocketProcess {
     private PrintWriter output;
     private Socket socket;
     private UserContext userContext;
-    private SocketProcessState currentState = null;
+    private ISocketProcessState currentState = null;
     private Integer socketProcessId;
     private DbHandler dbHandler;
     private PasswordAuthentication pwdAuth;
@@ -110,7 +110,7 @@ public class SocketProcess {
         return socketProcessId;
     }
 
-    public void setState(SocketProcessState newState){
+    public void setState(ISocketProcessState newState){
         currentState = newState;
         currentState.run();
     }

@@ -7,4 +7,5 @@ exit
 ClientManagerLoggedInState
 Options:
 logout
+delete (deletes user)
 exit

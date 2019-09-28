@@ -26,7 +26,7 @@ public class ConnectionManager {
             clientManager.run();
         }
         catch (IOException ex){
-            LOGGER.warning(ex.getMessage());
+            LOGGER.warning(ex.toString());
             closeSocket(socket);
         }
     }
@@ -40,7 +40,7 @@ public class ConnectionManager {
                 return;
             }
             catch (IOException ex){
-                LOGGER.warning(ex.getMessage());
+                LOGGER.warning(ex.toString());
                 closeSocket(socket);
             }
         }
@@ -50,6 +50,7 @@ public class ConnectionManager {
         try{
             if(socket != null){
                 socket.close();
+                LOGGER.warning("Socket closed");
             }
         } catch (Exception ex){
             LOGGER.warning("No socket to close");

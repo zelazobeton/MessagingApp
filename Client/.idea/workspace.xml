@@ -3,15 +3,23 @@
   <component name="ChangeListManager">
     <list default="true" id="46c09216-0889-4e43-9eea-67987c15b073" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interfaceOptionsToBuild.txt" beforeDir="false" afterPath="$PROJECT_DIR$/interfaceOptionsToBuild.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerIdleState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerIdleState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerLoggedInState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerLoggedInState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerWaitForLoginRespState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerWaitForLoginRespState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerWaitForLogoutRespState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerWaitForLogoutRespState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerWaitForRegisterRespState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientManagerWaitForRegisterRespState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/IClientManagerState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/IClientManagerState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ConnectionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ConnectionManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/MsgTypes.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/UserInputThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/UserInputThread.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/DbHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/DbHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/LoggerSingleton.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/LoggerSingleton.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/MsgTypes.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/MsgTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/MsgTypes.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketLoggedIdleState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketLoggedIdleState.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketNoUserState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketNoUserState.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketProcess.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketProcess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketProcessState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketProcessState.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/test/SocketManagerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketProcessState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/ISocketProcessState.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

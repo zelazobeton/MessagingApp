@@ -1,24 +1,21 @@
 package com.Client.src.ClientManagerService;
 
-import com.Client.src.InterfaceMapBuilder;
-import com.Client.src.LoggerSingleton;
-import com.Client.src.UserInputThread;
+import com.Client.src.*;
+
 import java.io.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 
 public class ClientManager {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-    public ArrayBlockingQueue<String> inputFromUserBuffer;
-    private BufferedReader serverReader;
-    public StringBuilder stringBuilder;
-    public PrintWriter clientWriter;
-    public Thread userInputThread;
     private IClientManagerState currentState = null;
-    private Scanner scanner;
+    private BufferedReader serverReader;
+    public ArrayBlockingQueue<String> inputFromUserBuffer;
+    public PrintWriter clientWriter;
+    public StringBuilder stringBuilder;
+    public Thread userInputThread;
     public Map<String, List<String>> interfaceMap;
 
     public ClientManager(InputStream inputStream,
@@ -27,7 +24,6 @@ public class ClientManager {
         this.serverReader = new BufferedReader(new InputStreamReader(inputStream));
         this.stringBuilder = new StringBuilder();
         this.clientWriter = new PrintWriter(outputStream, true);
-        this.scanner = new Scanner(System.in);
         this.interfaceMap = InterfaceMapBuilder.build();
         this.inputFromUserBuffer = new ArrayBlockingQueue<>(20);
         this.userInputThread = new Thread(new UserInputThread(inputFromUserBuffer));
@@ -39,16 +35,16 @@ public class ClientManager {
     }
 
     public void prepareAndSendLoginRespMsg(){
-        stringBuilder.append("LoginRespMsg_");
+        stringBuilder.append(MsgTypes.LoginRespMsg);
         appendCredentialsToStringBuilder();
-        clientWriter.println(stringBuilder.toString());
+        sendMsgToServer(stringBuilder.toString());
         stringBuilder.setLength(0);
     }
 
     public void prepareAndSendRegisterReqMsg(){
-        stringBuilder.append("RegisterReqMsg_");
+        stringBuilder.append(MsgTypes.RegisterReqMsg);
         appendCredentialsToStringBuilder();
-        clientWriter.println(stringBuilder.toString());
+        sendMsgToServer(stringBuilder.toString());
         stringBuilder.setLength(0);
     }
 
@@ -71,7 +67,6 @@ public class ClientManager {
 
     public void printInterface(String interfaceId){
         if(!interfaceMap.containsKey(interfaceId)){
-            LOGGER.warning("No such interfaceId: " + interfaceId);
             return;
         }
         List interfaceOptions = interfaceMap.get(interfaceId);
@@ -93,6 +88,7 @@ public class ClientManager {
         }
         catch (IOException ex){
             LOGGER.warning(ex.toString());
+            ex.printStackTrace();
             return null;
         }
     }
@@ -108,12 +104,12 @@ public class ClientManager {
         }
         catch (InterruptedException ex){
             LOGGER.warning(ex.toString());
+            ex.printStackTrace();
             return null;
         }
     }
 
     public void runUserInputThread(){
-        LOGGER.fine("User input thread run");
         userInputThread.start();
     }
 
@@ -128,6 +124,12 @@ public class ClientManager {
     public void setState(IClientManagerState newState){
         currentState = newState;
         currentState.run();
+    }
+
+    public void sendMsgToServer(String msg){
+        LOGGER.fine("Client send: " + msg +
+                    " in state: " + currentState.getClass().getSimpleName());
+        clientWriter.println(msg);
     }
 }
 

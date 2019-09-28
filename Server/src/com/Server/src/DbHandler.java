@@ -194,7 +194,7 @@ public class DbHandler {
     public boolean deleteUser(String username){
         try(Statement statement = conn.createStatement();){
             int deleted = statement.executeUpdate(
-                    "DELETE FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_NAME + "=" + username);
+                    "DELETE FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_NAME + "='" + username + "'");
             if(deleted != 1){
                 return false;
             }
