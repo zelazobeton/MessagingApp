@@ -1,9 +1,6 @@
 package com.Server.src.SocketProcessService;
 
-import com.Server.src.DbHandler;
-import com.Server.src.LoggerSingleton;
-import com.Server.src.PasswordAuthentication;
-import com.Server.src.UserContext;
+import com.Server.src.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,7 +37,7 @@ public class SocketProcess {
 
     public UserContext getUserDataFromDb(String username, String pwd){
         synchronized (dbHandler){
-            UserContext userContext = dbHandler.queryUserForUsername(username);
+            UserContext userContext = dbHandler.getUserContextForUsername(username);
             if(userContext != null && pwdAuth.authenticate(pwd.toCharArray(), userContext.getHash())){
                 return userContext;
             }
@@ -54,23 +51,23 @@ public class SocketProcess {
                         " username: " + userContext.getUsername() +
                         " hash: " + userContext.getHash());
             LOGGER.fine("Connection verified");
-            sendMsgToClient("LoginSuccessInd");
+            sendMsgToClient(MsgTypes.LoginSuccessInd);
             setState(new SocketLoggedIdleState(this));
         }
         else {
-            sendMsgToClient("LoginFailInd");
+            sendMsgToClient(MsgTypes.LoginFailInd);
         }
     }
 
     public void handleRegisterReqMsg(String[] msgInParts) {
         String hash = pwdAuth.hash(msgInParts[2].toCharArray());
         if(dbHandler.insertUser(msgInParts[1], hash)){
-            LOGGER.fine("Successfully created user: " + msgInParts[1] + " hash: " + hash);
-            sendMsgToClient("RegisterSuccessInd");
+            LOGGER.fine("Register for: " + msgInParts[1] + " hash: " + hash + " successed");
+            sendMsgToClient(MsgTypes.RegisterSuccessInd);
         }
         else {
-            LOGGER.fine("Registration for: " + msgInParts[1] + " hash: " + hash + " failed");
-            sendMsgToClient("RegisterFailInd");
+            LOGGER.fine("Register for: " + msgInParts[1] + " hash: " + hash + " failed");
+            sendMsgToClient(MsgTypes.RegisterFailInd);
         }
     }
 
@@ -90,12 +87,13 @@ public class SocketProcess {
             }
         }
         catch (IOException ex){
-            LOGGER.warning(ex.toString());
+            ex.printStackTrace();
             return null;
         }
     }
 
     public void sendMsgToClient(String msg){
+        LOGGER.fine("SocketProcessId: " + socketProcessId + " send msg: " + msg);
         output.println(msg);
     }
 
@@ -103,7 +101,8 @@ public class SocketProcess {
         try {
             Thread.sleep(millisecondsToSleep);
         } catch (InterruptedException ex) {
-            LOGGER.info("Thread interrupted: " + ex.getMessage());
+            LOGGER.info("SleepWithExceptionHandle interrupted: " + ex.toString());
+            ex.printStackTrace();
         }
     }
 
@@ -114,5 +113,15 @@ public class SocketProcess {
     public void setState(SocketProcessState newState){
         currentState = newState;
         currentState.run();
+    }
+
+    public void handleDeleteUserReq() {
+        if(!dbHandler.deleteUser(userContext.getUsername())){
+            sendMsgToClient(MsgTypes.DeleteUserFailInd);
+            return;
+        }
+        logoutUser();
+        sendMsgToClient(MsgTypes.DeleteUserSuccessInd);
+        setState(new SocketNoUserState(this));
     }
 }

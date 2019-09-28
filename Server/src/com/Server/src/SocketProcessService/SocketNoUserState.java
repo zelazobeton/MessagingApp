@@ -9,9 +9,6 @@ public class SocketNoUserState extends SocketProcessState {
 
     public SocketNoUserState(SocketProcess socketProcess) {
         super(socketProcess);
-        LOGGER.fine("SocketProcessId: " +
-                    super.socketProcess.getSocketProcessId() +
-                    " set to SocketNoUserState");
     }
 
     @Override
@@ -20,7 +17,7 @@ public class SocketNoUserState extends SocketProcessState {
         while(IS_RUNNING)
         {
             if((cycleCounter % 10) == 0){
-                super.socketProcess.sendMsgToClient("LoginReqMsg");
+                super.socketProcess.sendMsgToClient(MsgTypes.LoginReqMsg);
             }
 
             String[] msgFromClient = super.socketProcess.getMsgFromClient();
@@ -34,17 +31,17 @@ public class SocketNoUserState extends SocketProcessState {
     }
 
     public void handleMsgFromClient(String[] msgFromClient){
-        switch (MsgTypes.valueOf(msgFromClient[0])){
-            case LoginRespMsg:
-                LOGGER.fine("LoginRespMsg received in state SocketNoUserState");
+        LOGGER.fine("SocketProcessId: " + super.socketProcess.getSocketProcessId() +
+                    " received: " + msgFromClient[0] +
+                    " in state " + this.getClass().getSimpleName());
+        switch (msgFromClient[0]){
+            case MsgTypes.LoginRespMsg:
                 super.socketProcess.handleLoginRespMsg(msgFromClient);
                 break;
-            case RegisterReqMsg:
-                LOGGER.fine("RegisterReqMsg received in state SocketNoUserState");
+            case MsgTypes.RegisterReqMsg:
                 super.socketProcess.handleRegisterReqMsg(msgFromClient);
                 break;
-            case ClientExitInd:
-                LOGGER.fine("ClientExitInd received in state SocketNoUserState");
+            case MsgTypes.ClientExitInd:
                 IS_RUNNING = false;
                 break;
             default:

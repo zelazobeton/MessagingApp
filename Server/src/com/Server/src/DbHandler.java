@@ -29,16 +29,14 @@ public class DbHandler {
             " FROM " + TABLE_USERS + " WHERE " +
             COLUMN_USER_NAME + " = ?";
 
-    public static final String QUERY_USER_USERNAME_PWD =
+    public static final String QUERY_USER_FOR_USERNAME_AND_HASH =
             "SELECT " + COLUMN_USER_ID + ", " + COLUMN_USER_NAME + ", " + COLUMN_USER_HASH +
             " FROM " + TABLE_USERS + " WHERE " +
             COLUMN_USER_NAME + " = ? AND " + COLUMN_USER_HASH + " = ?";
 
-
-
     private PreparedStatement insertUserStmnt;
     private PreparedStatement queryUserForUsernameStmnt;
-    private PreparedStatement queryUserWithPwdStmnt;
+    private PreparedStatement queryUserForUsernameAndHashStmnt;
 
     private Connection conn;
 
@@ -48,11 +46,11 @@ public class DbHandler {
             createUserTable();
             insertUserStmnt = conn.prepareStatement(INSERT_USER);
             queryUserForUsernameStmnt = conn.prepareStatement(QUERY_USER_FOR_USERNAME);
-            queryUserWithPwdStmnt = conn.prepareStatement(QUERY_USER_USERNAME_PWD);
+            queryUserForUsernameAndHashStmnt = conn.prepareStatement(QUERY_USER_FOR_USERNAME_AND_HASH);
             return true;
         }
         catch(SQLException ex){
-            LOGGER.warning("Exception thrown while opening db: " + ex.getMessage());
+            LOGGER.warning("Exception thrown while opening db: " + ex.toString());
             return false;
         }
     }
@@ -65,8 +63,8 @@ public class DbHandler {
             if(queryUserForUsernameStmnt != null){
                 queryUserForUsernameStmnt.close();
             }
-            if(queryUserWithPwdStmnt != null){
-                queryUserWithPwdStmnt.close();
+            if(queryUserForUsernameAndHashStmnt != null){
+                queryUserForUsernameAndHashStmnt.close();
             }
 
             if(conn != null){
@@ -75,53 +73,55 @@ public class DbHandler {
             return true;
         }
         catch(SQLException ex){
-            System.out.println(ex.getMessage());
+            LOGGER.warning("Exception thrown while closing database: " + ex.toString());
             return false;
         }
     }
 
-    public UserContext queryUserForUsernameAndHash(String username, String hash){
+    public ResultSet queryUserForUsernameAndHash(String username, String hash){
         try{
-            queryUserWithPwdStmnt.setString(1, username);
-            queryUserWithPwdStmnt.setString(2, hash);
-            ResultSet result = queryUserWithPwdStmnt.executeQuery();
+            queryUserForUsernameAndHashStmnt.setString(1, username);
+            queryUserForUsernameAndHashStmnt.setString(2, hash);
+            ResultSet result = queryUserForUsernameAndHashStmnt.executeQuery();
             if(!result.isBeforeFirst()){
                 return null;
             }
-            UserContext userContext = createUserDataFromQueryResult(result);
-            return userContext;
+            return result;
         }
         catch(SQLException ex){
-            LOGGER.warning("queryUserForUsernameAndPwd " + ex.getMessage());
+            LOGGER.warning("Exception thrown while queryUserForUsernameAndPwd " + ex.toString());
             return null;
         }
     }
 
-    public UserContext queryUserForUsername(String username){
+    public ResultSet queryUserForUsername(String username){
         try{
             queryUserForUsernameStmnt.setString(1, username);
             ResultSet result = queryUserForUsernameStmnt.executeQuery();
             if(!result.isBeforeFirst()){
                 return null;
             }
-            UserContext userContext = createUserDataFromQueryResult(result);
-            return userContext;
+            return result;
         }
         catch(SQLException ex){
-            LOGGER.warning("queryUserForUsername " + ex.getMessage());
+            LOGGER.warning("Exception thrown while queryUserForUsername " + ex.toString());
             return null;
         }
     }
 
-    private UserContext createUserDataFromQueryResult(ResultSet result){
+    public UserContext getUserContextForUsername(String username){
+        ResultSet result = queryUserForUsername(username);
+        if(result == null){
+            return null;
+        }
         try{
-            final int userId = result.getInt(COLUMN_USER_ID);
-            final String username = result.getString(COLUMN_USER_NAME);
-            final String hash = result.getString(COLUMN_USER_HASH);
-            return new UserContext(userId, username, hash);
+            final int resultUserId = result.getInt(COLUMN_USER_ID);
+            final String resultUsername = result.getString(COLUMN_USER_NAME);
+            final String resultHash = result.getString(COLUMN_USER_HASH);
+            return new UserContext(resultUserId, resultUsername, resultHash);
         }
         catch(SQLException ex){
-            LOGGER.warning(ex.toString());
+            ex.printStackTrace();
             return null;
         }
     }
@@ -129,10 +129,11 @@ public class DbHandler {
     public boolean insertUser(String username, String hash){
         try {
             conn.setAutoCommit(false);
+            LOGGER.fine("DbHandler: setAutoCommitFalse");
             queryUserForUsernameStmnt.setString(1, username);
             ResultSet result = queryUserForUsernameStmnt.executeQuery();
             if (result.next()) {
-                LOGGER.warning("DB ERROR: User already exists");
+                LOGGER.warning("DbHandler: User already exists");
                 return false;
             }
 
@@ -149,7 +150,7 @@ public class DbHandler {
             }
         }
         catch (Exception ex){
-            LOGGER.warning(ex.getMessage());
+            LOGGER.warning("Exception thrown while insertUser " + ex.toString());
             performRollback();
             return false;
         }
@@ -164,17 +165,18 @@ public class DbHandler {
             conn.rollback();
         }
         catch (SQLException ex){
-            LOGGER.warning("Exception thrown during rollback" + ex.toString());
+            LOGGER.warning("Exception thrown while rollback" + ex.toString());
+            ex.printStackTrace();
         }
     }
 
     private void setAutoCommitTrue(){
         try{
-            LOGGER.fine("Resetting normal commit behavior");
+            LOGGER.fine("DbHandler: setAutoCommitTrue");
             conn.setAutoCommit(true);
         }
         catch (SQLException ex){
-            LOGGER.warning("Couldn't reset autocommit: " + ex.getMessage());
+            LOGGER.warning("Exception thrown while reset autocommit: " + ex.toString());
         }
     }
 
@@ -184,7 +186,22 @@ public class DbHandler {
             return true;
         }
         catch(SQLException ex){
-            LOGGER.warning(ex.getMessage());
+            LOGGER.warning("Exception thrown while createUserTable: " + ex.toString());
+            return false;
+        }
+    }
+
+    public boolean deleteUser(String username){
+        try(Statement statement = conn.createStatement();){
+            int deleted = statement.executeUpdate(
+                    "DELETE FROM " + TABLE_USERS + " WHERE " + COLUMN_USER_NAME + "=" + username);
+            if(deleted != 1){
+                return false;
+            }
+            return true;
+        }
+        catch(SQLException ex){
+            System.out.println(ex.getMessage());
             return false;
         }
     }

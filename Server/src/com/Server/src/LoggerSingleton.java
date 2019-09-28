@@ -32,7 +32,7 @@ public class LoggerSingleton {
             LOGGER.setLevel(Level.ALL);
         }
         catch (IOException ex){
-            System.out.println("Logger error: " + ex.toString());
+            ex.printStackTrace();
         }
     }
 

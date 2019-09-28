@@ -8,68 +8,70 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.logging.Logger;
 
 public class SocketManager {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-    private List<SocketProcess> socketProcesses;
-    private Queue<SocketProcess> contextsToVerify;
-    private ServerSocket serverSocket;
     private Integer CONNECTION_PORT;
+    private List<SocketProcess> socketProcesses;
+    private ServerSocket SERVER_SOCKET;
     private Integer numOfSocketsCreated;
     private DbHandler dbHandler;
 
     public SocketManager(Integer CONNECTION_PORT) {
         this.CONNECTION_PORT = CONNECTION_PORT;
-        socketProcesses = new ArrayList<>();
-        contextsToVerify = new ArrayDeque<>();
-        serverSocket = null;
-        numOfSocketsCreated = 0;
+        this.SERVER_SOCKET = null;
+        this.socketProcesses = new ArrayList<>();
+        this.numOfSocketsCreated = 0;
     }
 
     public void run() {
-        try{
-            openServerSocket();
-            openDatabase();
-            while(true){
-                try {
-                    openNewSocketForWaitingClient();
-                    sleepWithExceptionHandle(1000);
-                }
-                catch (IOException ex){
-                    LOGGER.warning(ex.toString());
-                }
+        if(!(prepareServerSocket() && openDatabase())) {
+            LOGGER.fine("Socket manager finished run after preparation failure");
+            return;
+        }
+
+        while(true){
+            try {
+                openNewSocketForWaitingClient();
+                sleepWithExceptionHandle(1000);
+            }
+            catch (IOException ex){
+                ex.printStackTrace();
             }
         }
+    }
+
+    private boolean prepareServerSocket(){
+        try{
+            openServerSocket();
+            return true;
+        }
         catch (Exception ex){
-            LOGGER.warning(ex.getMessage());
+            LOGGER.warning(ex.toString());
+            ex.printStackTrace();
             closeSocket();
             dbHandler.closeConnection();
+            return false;
         }
     }
 
     private void openServerSocket() throws IOException{
-        serverSocket = new ServerSocket(CONNECTION_PORT);
-        serverSocket.setSoTimeout(5000);
+        SERVER_SOCKET = new ServerSocket(CONNECTION_PORT);
+        SERVER_SOCKET.setSoTimeout(5000);
     }
 
-    private void openDatabase() throws Exception {
+    private boolean openDatabase() {
         this.dbHandler = new DbHandler();
-        if(!dbHandler.open()){
-            throw new Exception("Could not open database");
-        }
+        return dbHandler.open();
     }
-
-
 
     private void openNewSocketForWaitingClient() throws IOException{
-        LOGGER.fine("openNewSocketForWaitingClient");
-        Socket socket = serverSocket.accept();
-        LOGGER.fine("ServerSocket accepted");
+        LOGGER.fine("Try open new socket for client");
+        Socket socket = SERVER_SOCKET.accept();
+        LOGGER.fine("New socket accepted");
         BufferedReader input = new BufferedReader(
                 new InputStreamReader(socket.getInputStream()));
         PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
@@ -77,15 +79,15 @@ public class SocketManager {
         numOfSocketsCreated++;
         socketProcesses.add(socketProcess);
         socketProcess.run();
-//        contextsToVerify.add(socketContext);
     }
 
     private void closeSocket(){
         try{
-            this.serverSocket.close();
-            LOGGER.fine("Server socket closed");
+            this.SERVER_SOCKET.close();
+            LOGGER.fine("SERVER_SOCKET closed");
         } catch (Exception ex){
-            LOGGER.warning(ex.getMessage());
+            LOGGER.warning(ex.toString());
+            ex.printStackTrace();
         }
     }
 
@@ -93,7 +95,8 @@ public class SocketManager {
         try {
             Thread.sleep(millisecondsToSleep);
         } catch (InterruptedException ex) {
-            LOGGER.info("Thread interrupted: " + ex.getMessage());
+            LOGGER.info("sleepWithExceptionHandle interrupted: " + ex.toString());
+            ex.printStackTrace();
         }
     }
 }
