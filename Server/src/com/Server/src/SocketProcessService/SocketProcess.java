@@ -20,7 +20,7 @@ public class SocketProcess implements Runnable{
     private Socket clientSocket;
     private UserContext userContext;
     private ISocketProcessState currentState = null;
-    private Integer socketProcessId;
+    private final Integer socketProcessId;
     private DbHandler dbHandler;
     private PasswordAuthentication pwdAuth;
     private Thread noResponseTimer;
@@ -47,7 +47,7 @@ public class SocketProcess implements Runnable{
         this.loggedUsersMap = loggedUsersMap;
         this.socketProcessMsgQueue = socketProcessMsgQueue;
         this.mainMsgQueue = mainMsgQueue;
-        this.noResponseTimer = new Thread(new NoResponseTimerThread(socketProcessMsgQueue));
+        this.noResponseTimer = new Thread(new NoResponseTimerThread(socketProcessId, socketProcessMsgQueue));
         setState(new SocketNoUserState(this));
 
         LOGGER.fine("SocketProcess: " + socketProcessId + " created");
@@ -126,11 +126,11 @@ public class SocketProcess implements Runnable{
     private boolean addUserToLoggedUsersMap(int userId){
         synchronized (loggedUsersMap){
             if(loggedUsersMap.containsKey(userId)){
-                LOGGER.fine("Add userId: " + userId + " already logged in");
+                LOGGER.fine("loggedUsersMap add userId: " + userId + " already logged in");
                 return false;
             }
             loggedUsersMap.put(userId, socketProcessId);
-            LOGGER.fine("Add userId: " + userId + " success");
+            LOGGER.fine("loggedUsersMap add userId: " + userId + " success");
             return true;
         }
     }
@@ -138,11 +138,11 @@ public class SocketProcess implements Runnable{
     private boolean removeUserFromLoggedUsersMap(int userId){
         synchronized (loggedUsersMap){
             if(!loggedUsersMap.containsKey(userId)){
-                LOGGER.fine("Remove userId: " + userId + " not logged in");
+                LOGGER.fine("loggedUsersMap remove userId: " + userId + " not logged in");
                 return false;
             }
             loggedUsersMap.remove(userId);
-            LOGGER.fine("Remove userId: " + userId + " success");
+            LOGGER.fine("loggedUsersMap remove userId: " + userId + " success");
             return true;
         }
     }
