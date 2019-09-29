@@ -1,7 +1,6 @@
 package com.Server.src;
 
 import com.Server.src.SocketProcessService.SocketProcess;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,7 +19,7 @@ public class SocketManager {
     private DbHandler dbHandler;
     private ServerSocket SERVER_SOCKET;
 
-    private Map<Integer, Integer> loggedUsersIdsMap;
+    private Map<Integer, Integer> loggedUsersMap;
     private Map<Integer, ArrayBlockingQueue<String>> messageQueuesMap;
     private Map<Integer, Thread> socketProcessThreadMap;
     private ArrayBlockingQueue<String> mainMsgQueue;
@@ -32,7 +31,7 @@ public class SocketManager {
 
         this.socketProcessThreadMap = new HashMap<>();
         this.messageQueuesMap = new HashMap<>();
-        this.loggedUsersIdsMap = new HashMap<>();
+        this.loggedUsersMap = new HashMap<>();
         this.mainMsgQueue = new ArrayBlockingQueue<>(50);
     }
 
@@ -131,6 +130,7 @@ public class SocketManager {
                                                                outputPrintWriter,
                                                                clientSocket,
                                                                newSocketProcessId,
+                                                               loggedUsersMap,
                                                                socketProcessMsgQueue,
                                                                mainMsgQueue));
 

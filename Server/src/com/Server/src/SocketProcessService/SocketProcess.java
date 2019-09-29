@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 
@@ -23,6 +24,8 @@ public class SocketProcess implements Runnable{
     private DbHandler dbHandler;
     private PasswordAuthentication pwdAuth;
     private Thread noResponseTimer;
+    private Map<Integer, Integer> loggedUsersMap;
+
     public boolean IS_RUNNING = true;
 
     public SocketProcess(DbHandler dbHandler,
@@ -30,6 +33,7 @@ public class SocketProcess implements Runnable{
                          PrintWriter output,
                          Socket clientSocket,
                          Integer socketProcessId,
+                         Map<Integer, Integer> loggedUsersMap,
                          ArrayBlockingQueue<String> socketProcessMsgQueue,
                          ArrayBlockingQueue<String> mainMsgQueue)
     {
@@ -40,6 +44,7 @@ public class SocketProcess implements Runnable{
         this.userContext = null;
         this.socketProcessId = socketProcessId;
         this.pwdAuth = new PasswordAuthentication();
+        this.loggedUsersMap = loggedUsersMap;
         this.socketProcessMsgQueue = socketProcessMsgQueue;
         this.mainMsgQueue = mainMsgQueue;
         this.noResponseTimer = new Thread(new NoResponseTimerThread(socketProcessMsgQueue));
@@ -103,16 +108,42 @@ public class SocketProcess implements Runnable{
     }
 
     public void handleLoginRespMsg(String[] msgInParts){
-        if((this.userContext = getUserDataFromDb(msgInParts[1], msgInParts[2])) != null){
-            LOGGER.fine("userId: " + userContext.getUserId() +
+        if((userContext = getUserDataFromDb(msgInParts[1], msgInParts[2])) != null){
+            LOGGER.fine("Credentials verified");
+            if(addUserToLoggedUsersMap(userContext.getUserId())){
+                LOGGER.fine("userId: " + userContext.getUserId() +
                         " username: " + userContext.getUsername() +
                         " hash: " + userContext.getHash());
-            LOGGER.fine("Connection verified");
-            sendMsgToClient(MsgTypes.LoginSuccessInd);
-            setState(new SocketLoggedIdleState(this));
+                sendMsgToClient(MsgTypes.LoginSuccessInd);
+                setState(new SocketLoggedIdleState(this));
+                return;
+            }
+            userContext = null;
         }
-        else {
-            sendMsgToClient(MsgTypes.LoginFailInd);
+        sendMsgToClient(MsgTypes.LoginFailInd);
+    }
+
+    private boolean addUserToLoggedUsersMap(int userId){
+        synchronized (loggedUsersMap){
+            if(loggedUsersMap.containsKey(userId)){
+                LOGGER.fine("Add userId: " + userId + " already logged in");
+                return false;
+            }
+            loggedUsersMap.put(userId, socketProcessId);
+            LOGGER.fine("Add userId: " + userId + " success");
+            return true;
+        }
+    }
+
+    private boolean removeUserFromLoggedUsersMap(int userId){
+        synchronized (loggedUsersMap){
+            if(!loggedUsersMap.containsKey(userId)){
+                LOGGER.fine("Remove userId: " + userId + " not logged in");
+                return false;
+            }
+            loggedUsersMap.remove(userId);
+            LOGGER.fine("Remove userId: " + userId + " success");
+            return true;
         }
     }
 
@@ -129,6 +160,7 @@ public class SocketProcess implements Runnable{
     }
 
     public void logoutUser() {
+        removeUserFromLoggedUsersMap(userContext.getUserId());
         userContext = null;
     }
 
