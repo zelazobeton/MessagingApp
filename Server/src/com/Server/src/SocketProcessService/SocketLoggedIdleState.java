@@ -17,6 +17,9 @@ public class SocketLoggedIdleState extends ISocketProcessState {
                     " handle: " + msgFromClient[0] +
                     " in state " + this.getClass().getSimpleName());
         switch (msgFromClient[0]){
+            case MsgTypes.ConversationReqMsg:
+                super.socketProcess.handleConversationReq(msgFromClient);
+                break;
             case MsgTypes.LogoutReqMsg:
                 super.socketProcess.logoutUser();
                 super.socketProcess.sendMsgToClient(MsgTypes.LogoutRespMsg);
@@ -30,6 +33,7 @@ public class SocketLoggedIdleState extends ISocketProcessState {
                 super.socketProcess.handleDeleteUserReq();
                 break;
             default:
+                defaultMsgHandler(msgFromClient);
                 break;
         }
     }

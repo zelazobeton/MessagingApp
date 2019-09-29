@@ -2,7 +2,6 @@ package com.Server.src.SocketProcessService;
 
 import com.Server.src.LoggerSingleton;
 import com.Server.src.MsgTypes;
-
 import java.util.logging.Logger;
 
 public abstract class ISocketProcessState {

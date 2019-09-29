@@ -20,4 +20,6 @@ public class MsgTypes {
 
     public static final String NoResponseTimerExpired = "NoResponseTimerExpired";
     public static final String ClientLiveConnectionInd = "ClientLiveConnectionInd";
+
+    public static final String ConversationReqMsg = "ConversationReqMsg";
 }

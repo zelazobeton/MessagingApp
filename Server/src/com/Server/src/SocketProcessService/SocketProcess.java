@@ -9,9 +9,11 @@ import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 
-public class SocketProcess {
+public class SocketProcess implements Runnable{
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-    private ArrayBlockingQueue<String> messageQueue;
+    private ArrayBlockingQueue<String> socketProcessMsgQueue;
+    private ArrayBlockingQueue<String> mainMsgQueue;
+
     private BufferedReader input;
     private PrintWriter output;
     private Socket socket;
@@ -22,7 +24,14 @@ public class SocketProcess {
     private PasswordAuthentication pwdAuth;
     private Thread noResponseTimer;
 
-    public SocketProcess(DbHandler dbHandler, BufferedReader input, PrintWriter output, Socket socket, Integer socketProcessId) {
+    public SocketProcess(DbHandler dbHandler,
+                         BufferedReader input,
+                         PrintWriter output,
+                         Socket socket,
+                         Integer socketProcessId,
+                         ArrayBlockingQueue<String> socketProcessMsgQueue,
+                         ArrayBlockingQueue<String> mainMsgQueue)
+    {
         this.dbHandler = dbHandler;
         this.input = input;
         this.output = output;
@@ -30,12 +39,14 @@ public class SocketProcess {
         this.userContext = null;
         this.socketProcessId = socketProcessId;
         this.pwdAuth = new PasswordAuthentication();
-        this.messageQueue = new ArrayBlockingQueue<>(30);
-        this.noResponseTimer = new Thread(new NoResponseTimerThread(messageQueue));
+        this.socketProcessMsgQueue = socketProcessMsgQueue;
+        this.mainMsgQueue = mainMsgQueue;
+        this.noResponseTimer = new Thread(new NoResponseTimerThread(socketProcessMsgQueue));
 
         LOGGER.fine("SocketProcessId: " + socketProcessId + " created");
     }
 
+    @Override
     public void run(){
         noResponseTimer.start();
         setState(new SocketNoUserState(this));
@@ -86,7 +97,7 @@ public class SocketProcess {
     public void tryGetMsgFromClient(){
         try{
             if(input.ready()){
-                messageQueue.put(input.readLine());
+                socketProcessMsgQueue.put(input.readLine());
             }
         }
         catch (IOException | InterruptedException ex){
@@ -141,9 +152,9 @@ public class SocketProcess {
     }
 
     public String[] getNextMsgFromQueue(){
-        if(!messageQueue.isEmpty()){
+        if(!socketProcessMsgQueue.isEmpty()){
             try{
-                return messageQueue.take().split("_");
+                return socketProcessMsgQueue.take().split("_");
             }
             catch (InterruptedException ex){
                 LOGGER.warning("Exception thrown while getNextMsgFromQueue: " + ex.toString());
@@ -161,5 +172,12 @@ public class SocketProcess {
 
     public void resetNoResponseTimer(){
         noResponseTimer.interrupt();
+    }
+
+    public void handleConversationReq(String[] msgFromClient){
+        LOGGER.fine("handleConversationReq");
+//        checkIfUserExist
+//        checkIfUserOnlineAndGetsocketId
+//        putIntoMainQueue msg + socketId
     }
 }

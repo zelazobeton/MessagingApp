@@ -17,21 +17,37 @@ public class ClientMgr {
     public StringBuilder stringBuilder;
     public Thread userInputThread;
     public Map<String, List<String>> interfaceMap;
+    private Integer cycleCounter;
 
     public ClientMgr(InputStream inputStream,
                      OutputStream outputStream)
     {
+        this.cycleCounter = 0;
         this.serverReader = new BufferedReader(new InputStreamReader(inputStream));
         this.stringBuilder = new StringBuilder();
         this.clientWriter = new PrintWriter(outputStream, true);
         this.interfaceMap = InterfaceMapBuilder.build();
         this.inputFromUserBuffer = new ArrayBlockingQueue<>(20);
         this.userInputThread = new Thread(new UserInputThread(inputFromUserBuffer));
+        setState(new ClientMgrIdleState(this));
     }
 
     public void run(){
         runUserInputThread();
-        setState(new ClientMgrIdleState(this));
+        while(true){
+            tryHandleUserInput();
+            tryHandleMsgFromServer();
+            sendLiveConnInd();
+
+            sleepWithExceptionHandle(500);
+        }
+    }
+
+    private void sendLiveConnInd(){
+        if((cycleCounter % 80) == 0){
+            sendMsgToServer(MsgTypes.ClientLiveConnectionInd);
+        }
+        cycleCounter++;
     }
 
     public void prepareAndSendLoginRespMsg(){
@@ -73,10 +89,6 @@ public class ClientMgr {
         for(Object option : interfaceOptions){
             System.out.println(option);
         }
-    }
-
-    public void handleConversationReq(String[] msgFromServer){
-        return;
     }
 
     public String[] tryGetServerMsg() {
@@ -123,7 +135,6 @@ public class ClientMgr {
 
     public void setState(IClientMgrState newState){
         currentState = newState;
-        currentState.run();
     }
 
     public void sendMsgToServer(String msg){

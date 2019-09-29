@@ -8,23 +8,32 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 
 public class SocketManager {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     private Integer CONNECTION_PORT;
-    private List<SocketProcess> socketProcesses;
     private ServerSocket SERVER_SOCKET;
-    private Integer numOfSocketsCreated;
+    private int numOfSocketsCreated;
     private DbHandler dbHandler;
+
+    private Map<Integer, Integer> loggedUsersIdsMap;
+    private Map<Integer, ArrayBlockingQueue<String>> messageQueuesMap;
+    private Map<Integer, Thread> socketProcessThreadMap;
+    private ArrayBlockingQueue<String> mainMsgQueue;
 
     public SocketManager(Integer CONNECTION_PORT) {
         this.CONNECTION_PORT = CONNECTION_PORT;
         this.SERVER_SOCKET = null;
-        this.socketProcesses = new ArrayList<>();
         this.numOfSocketsCreated = 0;
+
+        this.socketProcessThreadMap = new HashMap<>();
+        this.messageQueuesMap = new HashMap<>();
+        this.loggedUsersIdsMap = new HashMap<>();
+        this.mainMsgQueue = new ArrayBlockingQueue<>(50);
     }
 
     public void run() {
@@ -35,7 +44,7 @@ public class SocketManager {
 
         while(true){
             try {
-                openNewSocketForWaitingClient();
+                tryOpenNewSocketForClient();
                 sleepWithExceptionHandle(1000);
             }
             catch (IOException ex){
@@ -68,17 +77,28 @@ public class SocketManager {
         return dbHandler.open();
     }
 
-    private void openNewSocketForWaitingClient() throws IOException{
+    private void tryOpenNewSocketForClient() throws IOException{
         LOGGER.fine("Try open new socket for client");
         Socket socket = SERVER_SOCKET.accept();
         LOGGER.fine("New socket accepted");
-        BufferedReader input = new BufferedReader(
+        BufferedReader inputBufferedReader = new BufferedReader(
                 new InputStreamReader(socket.getInputStream()));
-        PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-        SocketProcess socketProcess = new SocketProcess(dbHandler, input, output, socket, numOfSocketsCreated);
+        PrintWriter outputPrintWriter = new PrintWriter(socket.getOutputStream(), true);
+
+        ArrayBlockingQueue<String> socketProcessMsgQueue = new ArrayBlockingQueue<>(30);
+        Thread newSocketProcess = new Thread(new SocketProcess(dbHandler,
+                                                               inputBufferedReader,
+                                                               outputPrintWriter,
+                                                               socket,
+                                                               numOfSocketsCreated,
+                                                               socketProcessMsgQueue,
+                                                               mainMsgQueue));
+
+        socketProcessThreadMap.put(numOfSocketsCreated, newSocketProcess);
+        messageQueuesMap.put(numOfSocketsCreated, socketProcessMsgQueue);
+        mainMsgQueue = new ArrayBlockingQueue<>(50);
         numOfSocketsCreated++;
-        socketProcesses.add(socketProcess);
-        socketProcess.run();
+        newSocketProcess.run();
     }
 
     private void closeSocket(){
