@@ -1,7 +1,7 @@
 package com.Server.src;
 
 public class MsgTypes {
-    public static final String LoginReqMsg = "LoginReqMsg";
+    //Client communication messages:
     public static final String LoginRespMsg = "LoginRespMsg";
     public static final String LoginSuccessInd = "LoginSuccessInd";
     public static final String LoginFailInd = "LoginFailInd";
@@ -22,4 +22,8 @@ public class MsgTypes {
     public static final String ClientLiveConnectionInd = "ClientLiveConnectionInd";
 
     public static final String ConversationReqMsg = "ConversationReqMsg";
+
+    //Internal server messages:
+    public static final String SocketProcessExit = "SocketProcessExit";
+
 }

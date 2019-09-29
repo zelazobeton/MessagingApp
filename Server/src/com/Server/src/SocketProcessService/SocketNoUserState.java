@@ -13,7 +13,7 @@ public class SocketNoUserState extends ISocketProcessState {
 
     @Override
     protected void handleMsg(String[] msgFromClient){
-        LOGGER.fine("SocketProcessId: " + super.socketProcess.getSocketProcessId() +
+        LOGGER.fine("SocketProcess: " + super.socketProcess.getSocketProcessId() +
                     " handle: " + msgFromClient[0] +
                     " in state " + this.getClass().getSimpleName());
         switch (msgFromClient[0]){
@@ -24,7 +24,7 @@ public class SocketNoUserState extends ISocketProcessState {
                 super.socketProcess.handleRegisterReqMsg(msgFromClient);
                 break;
             case MsgTypes.ClientExitInd:
-                IS_RUNNING = false;
+                socketProcess.finishSocketProcess();
                 break;
             default:
                 defaultMsgHandler(msgFromClient);

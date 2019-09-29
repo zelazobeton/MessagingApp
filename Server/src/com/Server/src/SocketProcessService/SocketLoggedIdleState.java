@@ -13,7 +13,7 @@ public class SocketLoggedIdleState extends ISocketProcessState {
 
     @Override
     protected void handleMsg(String[] msgFromClient){
-        LOGGER.fine("SocketProcessId: " + super.socketProcess.getSocketProcessId() +
+        LOGGER.fine("SocketProcess: " + super.socketProcess.getSocketProcessId() +
                     " handle: " + msgFromClient[0] +
                     " in state " + this.getClass().getSimpleName());
         switch (msgFromClient[0]){
@@ -27,7 +27,7 @@ public class SocketLoggedIdleState extends ISocketProcessState {
                 break;
             case MsgTypes.ClientExitInd:
                 super.socketProcess.logoutUser();
-                IS_RUNNING = false;
+                socketProcess.finishSocketProcess();
                 break;
             case MsgTypes.DeleteUserReqMsg:
                 super.socketProcess.handleDeleteUserReq();

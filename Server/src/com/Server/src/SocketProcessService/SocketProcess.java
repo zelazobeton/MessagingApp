@@ -16,18 +16,19 @@ public class SocketProcess implements Runnable{
 
     private BufferedReader input;
     private PrintWriter output;
-    private Socket socket;
+    private Socket clientSocket;
     private UserContext userContext;
     private ISocketProcessState currentState = null;
     private Integer socketProcessId;
     private DbHandler dbHandler;
     private PasswordAuthentication pwdAuth;
     private Thread noResponseTimer;
+    public boolean IS_RUNNING = true;
 
     public SocketProcess(DbHandler dbHandler,
                          BufferedReader input,
                          PrintWriter output,
-                         Socket socket,
+                         Socket clientSocket,
                          Integer socketProcessId,
                          ArrayBlockingQueue<String> socketProcessMsgQueue,
                          ArrayBlockingQueue<String> mainMsgQueue)
@@ -35,22 +36,60 @@ public class SocketProcess implements Runnable{
         this.dbHandler = dbHandler;
         this.input = input;
         this.output = output;
-        this.socket = socket;
+        this.clientSocket = clientSocket;
         this.userContext = null;
         this.socketProcessId = socketProcessId;
         this.pwdAuth = new PasswordAuthentication();
         this.socketProcessMsgQueue = socketProcessMsgQueue;
         this.mainMsgQueue = mainMsgQueue;
         this.noResponseTimer = new Thread(new NoResponseTimerThread(socketProcessMsgQueue));
+        setState(new SocketNoUserState(this));
 
-        LOGGER.fine("SocketProcessId: " + socketProcessId + " created");
+        LOGGER.fine("SocketProcess: " + socketProcessId + " created");
     }
 
     @Override
     public void run(){
         noResponseTimer.start();
-        setState(new SocketNoUserState(this));
-        LOGGER.fine("socketProcessId: " + socketProcessId + " exits");
+        while(IS_RUNNING){
+            sleepWithExceptionHandle(500);
+            tryEnqueueMsgFromClient();
+            tryHandleNextMsgFromSocketProcessQueue();
+        }
+        LOGGER.fine("SocketProcess: " + socketProcessId + " finished running");
+    }
+
+    public void finishSocketProcess(){
+        LOGGER.fine("SocketProcess: " + socketProcessId + " exits");
+        try{
+            closeSocket();
+            sendSocketProcessExitToSocketMgr();
+            IS_RUNNING = false;
+        }
+        catch (Exception ex){
+            LOGGER.warning(ex.toString());
+        }
+    }
+
+    private void sendSocketProcessExitToSocketMgr() throws Exception {
+        try{
+            mainMsgQueue.put(MsgTypes.SocketProcessExit + "_" + this.socketProcessId);
+            LOGGER.fine("SocketProcessExit put into mainMsgQueue");
+        }
+        catch (InterruptedException ex){
+            LOGGER.warning("SocketProcess: " + socketProcessId + " Error while sending SocketProcessExit");
+            throw new Exception("SocketProcess: " + socketProcessId + "Finish socketProcess failed");
+        }
+    }
+
+    private void closeSocket() throws Exception{
+        try{
+            clientSocket.close();
+        }
+        catch (IOException ex){
+            LOGGER.warning("SocketProcess: " + socketProcessId + " Error while closing socket");
+            throw new Exception("SocketProcess: " + socketProcessId + "Finish socketProcess failed");
+        }
     }
 
     public UserContext getUserDataFromDb(String username, String pwd){
@@ -94,7 +133,7 @@ public class SocketProcess implements Runnable{
     }
 
 
-    public void tryGetMsgFromClient(){
+    public void tryEnqueueMsgFromClient(){
         try{
             if(input.ready()){
                 socketProcessMsgQueue.put(input.readLine());
@@ -105,21 +144,8 @@ public class SocketProcess implements Runnable{
         }
     }
 
-    public String[] getMsgFromClient(){
-        try{
-            if(input.ready()){
-                String[] msgInParts = input.readLine().split("_");
-                return msgInParts;
-            }
-        }
-        catch (IOException ex){
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
     public void sendMsgToClient(String msg){
-        LOGGER.fine("SocketProcessId: " + socketProcessId + " send msg: " + msg);
+        LOGGER.fine("SocketProcess: " + socketProcessId + " send msg: " + msg);
         output.println(msg);
     }
 
@@ -138,7 +164,6 @@ public class SocketProcess implements Runnable{
 
     public void setState(ISocketProcessState newState){
         currentState = newState;
-        currentState.run();
     }
 
     public void handleDeleteUserReq() {
@@ -151,20 +176,21 @@ public class SocketProcess implements Runnable{
         setState(new SocketNoUserState(this));
     }
 
-    public String[] getNextMsgFromQueue(){
+    public String[] tryGetNextMsgFromSocketProcessQueue(){
         if(!socketProcessMsgQueue.isEmpty()){
             try{
                 return socketProcessMsgQueue.take().split("_");
             }
             catch (InterruptedException ex){
-                LOGGER.warning("Exception thrown while getNextMsgFromQueue: " + ex.toString());
+                LOGGER.warning("Exception thrown while tryGetNextMsgFromSocketProcessQueue: " +
+                                ex.toString());
             }
         }
         return null;
     }
 
-    public void tryHandleNextMsgFromQueue(){
-        String[] msgToHandle = getNextMsgFromQueue();
+    public void tryHandleNextMsgFromSocketProcessQueue(){
+        String[] msgToHandle = tryGetNextMsgFromSocketProcessQueue();
         if(msgToHandle != null) {
             currentState.handleMsg(msgToHandle);
         }

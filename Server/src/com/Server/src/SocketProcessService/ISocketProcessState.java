@@ -7,25 +7,15 @@ import java.util.logging.Logger;
 public abstract class ISocketProcessState {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     protected SocketProcess socketProcess;
-    protected boolean IS_RUNNING = true;
 
     public ISocketProcessState(SocketProcess socketProcess) {
         this.socketProcess = socketProcess;
-        LOGGER.fine("SocketProcessId: " +
+        LOGGER.fine("SocketProcess: " +
                 socketProcess.getSocketProcessId() +
                 " set to " + this.getClass().getSimpleName());
     }
 
     protected abstract void handleMsg(String[] msgFromClient);
-
-    public void run() {
-        while(IS_RUNNING){
-            socketProcess.tryGetMsgFromClient();
-            socketProcess.tryHandleNextMsgFromQueue();
-
-            socketProcess.sleepWithExceptionHandle(500);
-        }
-    }
 
     protected void defaultMsgHandler(String[] msgFromQueue){
         switch (msgFromQueue[0]){
@@ -34,7 +24,7 @@ public abstract class ISocketProcessState {
                 break;
             case MsgTypes.NoResponseTimerExpired:
                 socketProcess.logoutUser();
-                IS_RUNNING = false;
+                socketProcess.IS_RUNNING = false;
                 break;
             default:
                 break;

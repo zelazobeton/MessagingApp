@@ -39,6 +39,5 @@ public class ClientMgrIdleState extends IClientMgrState {
             default:
                 System.out.println("Incorrect input");
         }
-        return;
     }
 }

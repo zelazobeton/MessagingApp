@@ -16,9 +16,9 @@ import java.util.logging.Logger;
 public class SocketManager {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     private Integer CONNECTION_PORT;
-    private ServerSocket SERVER_SOCKET;
-    private int numOfSocketsCreated;
+    private int numOfClientConnectionsCreated;
     private DbHandler dbHandler;
+    private ServerSocket SERVER_SOCKET;
 
     private Map<Integer, Integer> loggedUsersIdsMap;
     private Map<Integer, ArrayBlockingQueue<String>> messageQueuesMap;
@@ -27,8 +27,8 @@ public class SocketManager {
 
     public SocketManager(Integer CONNECTION_PORT) {
         this.CONNECTION_PORT = CONNECTION_PORT;
+        this.numOfClientConnectionsCreated = 0;
         this.SERVER_SOCKET = null;
-        this.numOfSocketsCreated = 0;
 
         this.socketProcessThreadMap = new HashMap<>();
         this.messageQueuesMap = new HashMap<>();
@@ -37,39 +37,68 @@ public class SocketManager {
     }
 
     public void run() {
-        if(!(prepareServerSocket() && openDatabase())) {
+        if(!(prepareServerSocket() && openDatabase())){
             LOGGER.fine("Socket manager finished run after preparation failure");
             return;
         }
 
         while(true){
-            try {
-                tryOpenNewSocketForClient();
-                sleepWithExceptionHandle(1000);
-            }
-            catch (IOException ex){
-                LOGGER.warning(ex.toString());
-            }
+            tryOpenNewClientConn();
+            tryHandleNextMsgFromMainQueue();
+            sleepWithExceptionHandle(1000);
         }
     }
 
-    private boolean prepareServerSocket(){
+    public void tryHandleNextMsgFromMainQueue(){
+        String[] msgFromMainQueue = tryGetNextMsgFromMainQueue();
+        if(msgFromMainQueue == null) {
+            return;
+        }
+        LOGGER.fine("SocketManager handle: " + msgFromMainQueue[0]);
+        switch (msgFromMainQueue[0]) {
+            case MsgTypes.SocketProcessExit:
+                handleSocketProcessExit(msgFromMainQueue);
+                break;
+            default:
+                return;
+        }
+    }
+
+    public String[] tryGetNextMsgFromMainQueue(){
+        if(!mainMsgQueue.isEmpty()){
+            try{
+                return mainMsgQueue.take().split("_");
+            }
+            catch (InterruptedException ex){
+                LOGGER.warning("Exception thrown while tryGetNextMsgFromMainQueue: " + ex.toString());
+            }
+        }
+        return null;
+    }
+
+    private boolean prepareServerSocket() {
         try{
-            openServerSocket();
+            SERVER_SOCKET = new ServerSocket(CONNECTION_PORT);
+            SERVER_SOCKET.setSoTimeout(2000);
             return true;
         }
         catch (Exception ex){
-            LOGGER.warning(ex.toString());
-            ex.printStackTrace();
+            LOGGER.warning("Error while preparing SERVER_SOCKET: " + ex.toString());
             closeSocket();
-            dbHandler.closeConnection();
             return false;
         }
     }
 
-    private void openServerSocket() throws IOException{
-        SERVER_SOCKET = new ServerSocket(CONNECTION_PORT);
-        SERVER_SOCKET.setSoTimeout(5000);
+    private void closeSocket(){
+        if(SERVER_SOCKET == null){
+            return;
+        }
+        try{
+            SERVER_SOCKET.close();
+        }
+        catch (Exception ex){
+            LOGGER.warning("Error while closing SERVER_SOCKET: " + ex.toString());
+        }
     }
 
     private boolean openDatabase() {
@@ -77,38 +106,40 @@ public class SocketManager {
         return dbHandler.open();
     }
 
-    private void tryOpenNewSocketForClient() throws IOException{
-        LOGGER.fine("Try open new socket for client");
-        Socket socket = SERVER_SOCKET.accept();
-        LOGGER.fine("New socket accepted");
+    private void tryOpenNewClientConn() {
+        try{
+            /*LOGGING_CLEAR*/
+//            LOGGER.fine("Try open new client connection");
+            Socket clientSocket = SERVER_SOCKET.accept();
+            createAndRunNewSocketProcess(clientSocket);
+        }
+        catch (IOException ex){
+            /*LOGGING_CLEAR*/
+//            LOGGER.warning("Error while opening new client connection: " + ex.getMessage());
+        }
+    }
+
+    private void createAndRunNewSocketProcess(Socket clientSocket) throws IOException{
         BufferedReader inputBufferedReader = new BufferedReader(
-                new InputStreamReader(socket.getInputStream()));
-        PrintWriter outputPrintWriter = new PrintWriter(socket.getOutputStream(), true);
+                new InputStreamReader(clientSocket.getInputStream()));
+        PrintWriter outputPrintWriter = new PrintWriter(clientSocket.getOutputStream(), true);
 
         ArrayBlockingQueue<String> socketProcessMsgQueue = new ArrayBlockingQueue<>(30);
+        int newSocketProcessId = numOfClientConnectionsCreated;
         Thread newSocketProcess = new Thread(new SocketProcess(dbHandler,
                                                                inputBufferedReader,
                                                                outputPrintWriter,
-                                                               socket,
-                                                               numOfSocketsCreated,
+                                                               clientSocket,
+                                                               newSocketProcessId,
                                                                socketProcessMsgQueue,
                                                                mainMsgQueue));
 
-        socketProcessThreadMap.put(numOfSocketsCreated, newSocketProcess);
-        messageQueuesMap.put(numOfSocketsCreated, socketProcessMsgQueue);
-        mainMsgQueue = new ArrayBlockingQueue<>(50);
-        numOfSocketsCreated++;
-        newSocketProcess.run();
-    }
 
-    private void closeSocket(){
-        try{
-            this.SERVER_SOCKET.close();
-            LOGGER.fine("SERVER_SOCKET closed");
-        } catch (Exception ex){
-            LOGGER.warning(ex.toString());
-            ex.printStackTrace();
-        }
+        socketProcessThreadMap.put(newSocketProcessId, newSocketProcess);
+        messageQueuesMap.put(newSocketProcessId, socketProcessMsgQueue);
+        numOfClientConnectionsCreated++;
+        newSocketProcess.start();
+        LOGGER.fine("SocketProcess: " + newSocketProcessId + " created successfully");
     }
 
     private void sleepWithExceptionHandle(Integer millisecondsToSleep){
@@ -118,5 +149,21 @@ public class SocketManager {
             LOGGER.info("sleepWithExceptionHandle interrupted: " + ex.toString());
             ex.printStackTrace();
         }
+    }
+
+    private void handleSocketProcessExit(String[] msgFromMainQueue){
+        Integer socketProcessToFinishId = Integer.parseInt(msgFromMainQueue[1]);
+        Thread socketProcessThreadToFinish = socketProcessThreadMap.get(socketProcessToFinishId);
+        try{
+            socketProcessThreadToFinish.join();
+        }
+        catch (InterruptedException ex){
+            LOGGER.warning("Error while exiting SocketProcess: " +
+                            socketProcessToFinishId +
+                            "Could not join");
+        }
+        socketProcessThreadMap.remove(socketProcessToFinishId);
+        messageQueuesMap.remove(socketProcessToFinishId);
+        LOGGER.fine("SocketProcess: " + socketProcessToFinishId + " removed successfully");
     }
 }
