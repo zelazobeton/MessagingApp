@@ -12,22 +12,19 @@ import java.util.logging.Logger;
 
 public class SocketProcess implements Runnable{
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-    private ArrayBlockingQueue<String> socketProcessMsgQueue;
+    private Socket clientSocket;
+    private DbHandler dbHandler;
     private ArrayBlockingQueue<String> mainMsgQueue;
+    private ArrayBlockingQueue<String> socketProcessMsgQueue;
+    private Map<Integer, Integer> loggedUsersMap;
 
     private BufferedReader input;
     private PrintWriter output;
-    private Socket clientSocket;
     private UserContext userContext;
-    private ISocketProcessState currentState = null;
     private final Integer socketProcessId;
-    private DbHandler dbHandler;
-    private PasswordAuthentication pwdAuth;
+    private ISocketProcessState currentState = null;
     private Thread noResponseTimer;
-    private Map<Integer, Integer> loggedUsersMap;
-    private StringBuilder stringBuilder;
-
-    public boolean IS_RUNNING = true;
+    public boolean IS_RUNNING;
 
     public SocketProcess(DbHandler dbHandler,
                          BufferedReader input,
@@ -39,17 +36,16 @@ public class SocketProcess implements Runnable{
                          ArrayBlockingQueue<String> mainMsgQueue)
     {
         this.dbHandler = dbHandler;
-        this.stringBuilder = new StringBuilder();
         this.input = input;
         this.output = output;
         this.clientSocket = clientSocket;
         this.userContext = null;
         this.socketProcessId = socketProcessId;
-        this.pwdAuth = new PasswordAuthentication();
         this.loggedUsersMap = loggedUsersMap;
         this.socketProcessMsgQueue = socketProcessMsgQueue;
         this.mainMsgQueue = mainMsgQueue;
         this.noResponseTimer = new Thread(new NoResponseTimerThread(socketProcessId, socketProcessMsgQueue));
+        this.IS_RUNNING = true;
         setState(new SocketNoUserState(this));
     }
 
@@ -60,7 +56,6 @@ public class SocketProcess implements Runnable{
             sleepWithExceptionHandle(500);
             tryEnqueueMsgFromClient();
             tryHandleNextMsgFromSocketProcessQueue();
-//            tryHandleNextMsgFromMainQueue();
         }
         LOGGER.fine("SocketProcess: " + socketProcessId + " finished running");
     }
@@ -69,7 +64,6 @@ public class SocketProcess implements Runnable{
         LOGGER.fine("SocketProcess: " + socketProcessId + " exits");
         try{
             closeSocket();
-//            sendIntSocketProcessExitToSocketMgr();
             sendMsgToMainServer(MsgTypes.IntSocketProcessExit + "_" + socketProcessId);
             IS_RUNNING = false;
         }
@@ -102,7 +96,7 @@ public class SocketProcess implements Runnable{
     public UserContext getAndAuthenticateUserDataFromDb(String username, String pwd){
         synchronized (dbHandler){
             UserContext userContext = dbHandler.getUserContextForUsername(username);
-            if(userContext != null && pwdAuth.authenticate(pwd.toCharArray(), userContext.getHash())){
+            if(userContext != null && (new PasswordAuthentication()).authenticate(pwd.toCharArray(), userContext.getHash())){
                 return userContext;
             }
             return null;
@@ -150,7 +144,7 @@ public class SocketProcess implements Runnable{
     }
 
     public void handleRegisterReqMsg(String[] msgInParts) {
-        String hash = pwdAuth.hash(msgInParts[2].toCharArray());
+        String hash = (new PasswordAuthentication()).hash(msgInParts[2].toCharArray());
         if(dbHandler.insertUser(msgInParts[1], hash)){
             LOGGER.fine("Register for: " + msgInParts[1] + " hash: " + hash + " successed");
             sendMsgToClient(MsgTypes.RegisterSuccessInd);
