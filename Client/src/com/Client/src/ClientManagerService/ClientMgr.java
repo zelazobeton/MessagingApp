@@ -12,11 +12,11 @@ public class ClientMgr {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     private IClientMgrState currentState = null;
     private BufferedReader serverReader;
-    public ArrayBlockingQueue<String> inputFromUserBuffer;
-    public PrintWriter clientWriter;
-    public StringBuilder stringBuilder;
-    public Thread userInputThread;
-    public Map<String, List<String>> interfaceMap;
+    private ArrayBlockingQueue<String> inputFromUserBuffer;
+    private PrintWriter clientWriter;
+    private StringBuilder stringBuilder;
+    private Thread userInputThread;
+    private Map<String, List<String>> interfaceMap;
     private Integer cycleCounter;
 
     public ClientMgr(InputStream inputStream,
@@ -52,6 +52,7 @@ public class ClientMgr {
 
     public void prepareAndSendLoginRespMsg(){
         stringBuilder.append(MsgTypes.LoginRespMsg);
+        stringBuilder.append("_");
         appendCredentialsToStringBuilder();
         sendMsgToServer(stringBuilder.toString());
         stringBuilder.setLength(0);
@@ -59,6 +60,7 @@ public class ClientMgr {
 
     public void prepareAndSendRegisterReqMsg(){
         stringBuilder.append(MsgTypes.RegisterReqMsg);
+        stringBuilder.append("_");
         appendCredentialsToStringBuilder();
         sendMsgToServer(stringBuilder.toString());
         stringBuilder.setLength(0);
@@ -157,8 +159,9 @@ public class ClientMgr {
         }
     }
 
-    public void startConversation(){
-        stringBuilder.append(MsgTypes.ConversationReqMsg);
+    public void handleConverstationReq(){
+        stringBuilder.append(MsgTypes.ConvInitReqMsg);
+        stringBuilder.append("_");
         String userInput;
         inputFromUserBuffer.clear();
         System.out.println("Who do you want to talk to?\nEnter username: ");
@@ -178,6 +181,23 @@ public class ClientMgr {
         }
         setState(new ClientMgrConversationState(this));
         return true;
+    }
+
+    public void handleConvInitFailure(String[] msgFromServer){
+        switch (msgFromServer[1]){
+            case "UserNotExist":
+                System.out.println("No such user");
+                break;
+            case "UserNotLogged":
+                System.out.println("Requested user is not logged in");
+                break;
+            case "UserBusy":
+                System.out.println("Requested user is busy");
+                break;
+            default:
+                System.out.println("Internal error. Please try again");
+                break;
+        }
     }
 }
 

@@ -15,7 +15,7 @@ public abstract class ISocketProcessState {
                 " set to " + this.getClass().getSimpleName());
     }
 
-    protected abstract void handleMsg(String[] msgFromClient);
+    protected abstract void handleMsgFromSocketProcessQueue(String[] msgFromClient);
 
     protected void defaultMsgHandler(String[] msgFromQueue){
         switch (msgFromQueue[0]){

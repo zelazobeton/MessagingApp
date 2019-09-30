@@ -16,8 +16,6 @@ public class ClientMgrLoggedInState extends IClientMgrState {
         LOGGER.fine("Client received: " + msgFromServer[0] +
                 " in state " + this.getClass().getSimpleName());
         switch (msgFromServer[0]) {
-            case MsgTypes.ConversationReqMsg:
-                break;
             default:
                 return;
         }
@@ -27,7 +25,7 @@ public class ClientMgrLoggedInState extends IClientMgrState {
     protected void handleUserInput(String userInput) {
         switch (userInput){
             case "start":
-                super.clientMgr.startConversation();
+                super.clientMgr.handleConverstationReq();
                 super.clientMgr.setState(new ClientMgrWaitForConversationStartResp(super.clientMgr));
                 break;
             case "logout":

@@ -94,6 +94,11 @@ public class DbHandler {
         }
     }
 
+    public boolean userExistInDb(String username){
+        ResultSet result = queryUserForUsername(username);
+        return result != null;
+    }
+
     public ResultSet queryUserForUsername(String username){
         try{
             queryUserForUsernameStmnt.setString(1, username);

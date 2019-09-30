@@ -12,13 +12,16 @@ public class SocketLoggedIdleState extends ISocketProcessState {
     }
 
     @Override
-    protected void handleMsg(String[] msgFromClient){
+    protected void handleMsgFromSocketProcessQueue(String[] msgInParts){
         LOGGER.fine("SocketProcess: " + super.socketProcess.getSocketProcessId() +
-                    " handle: " + msgFromClient[0] +
+                    " handle: " + msgInParts[0] +
                     " in state " + this.getClass().getSimpleName());
-        switch (msgFromClient[0]){
-            case MsgTypes.ConversationReqMsg:
-                super.socketProcess.handleConversationReq(msgFromClient);
+        switch (msgInParts[0]){
+            case MsgTypes.ConvInitReqMsg:
+                super.socketProcess.handleConvInitReq(msgInParts);
+                break;
+            case MsgTypes.IntConvInitReqMsg:
+                super.socketProcess.ignoreIntConvInitReqMsg(msgInParts);
                 break;
             case MsgTypes.LogoutReqMsg:
                 super.socketProcess.logoutUser();
@@ -33,7 +36,7 @@ public class SocketLoggedIdleState extends ISocketProcessState {
                 super.socketProcess.handleDeleteUserReq();
                 break;
             default:
-                defaultMsgHandler(msgFromClient);
+                defaultMsgHandler(msgInParts);
                 break;
         }
     }
