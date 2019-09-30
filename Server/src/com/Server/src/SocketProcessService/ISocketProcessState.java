@@ -2,6 +2,8 @@ package com.Server.src.SocketProcessService;
 
 import com.Server.src.LoggerSingleton;
 import com.Server.src.MsgTypes;
+import com.Server.src.ServerTimers.TimerTypeName;
+
 import java.util.logging.Logger;
 
 public abstract class ISocketProcessState {
@@ -20,11 +22,13 @@ public abstract class ISocketProcessState {
     protected void defaultMsgHandler(String[] msgFromQueue){
         switch (msgFromQueue[0]){
             case MsgTypes.ClientLiveConnectionInd:
-                socketProcess.resetNoResponseTimer();
+                socketProcess.resetTimer(TimerTypeName.NoResponseTimer);
                 break;
-            case MsgTypes.IntNoResponseTimerExpired:
-                socketProcess.logoutUser();
-                socketProcess.IS_RUNNING = false;
+            case MsgTypes.TimerExpired:
+                if(msgFromQueue[1].equals(TimerTypeName.NoResponseTimer)){
+                    socketProcess.logoutUser();
+                    socketProcess.IS_RUNNING = false;
+                }
                 break;
             default:
                 break;

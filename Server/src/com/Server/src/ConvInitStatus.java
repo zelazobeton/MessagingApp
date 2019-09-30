@@ -5,4 +5,5 @@ public class ConvInitStatus {
     public static final String UserNotLogged = "UserNotLogged";
     public static final String UserBusy = "UserBusy";
     public static final String Unspecified = "Unspecified";
+    public static final String TimerExpired = "TimerExpired";
 }

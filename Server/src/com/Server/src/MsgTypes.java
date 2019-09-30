@@ -26,6 +26,7 @@ public class MsgTypes {
 
     //Internal server messages:
     public static final String IntNoResponseTimerExpired = "IntNoResponseTimerExpired";
+    public static final String TimerExpired = "TimerExpired";
 
     public static final String IntSocketProcessExit = "IntSocketProcessExit";
 

@@ -2,7 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46c09216-0889-4e43-9eea-67987c15b073" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/ServerTimers/ServerTimer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/ConvInitStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/ConvInitStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/MsgTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/MsgTypes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/NoResponseTimerThread.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/ISocketProcessState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/ISocketProcessState.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketProcess.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketProcess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketWaitForConvAcceptState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketWaitForConvAcceptState.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -40,7 +47,7 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4" value="" />
     <property name="create.test.in.the.same.root" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Server" />
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">

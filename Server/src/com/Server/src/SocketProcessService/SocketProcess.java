@@ -1,12 +1,18 @@
 package com.Server.src.SocketProcessService;
 
 import com.Server.src.*;
+import com.Server.src.ServerTimers.ServerTimer;
+import com.Server.src.ServerTimers.TimerTypeData;
+import com.Server.src.ServerTimers.TimerTypeName;
+import com.Server.src.ServerTimers.TimerType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 
@@ -17,13 +23,14 @@ public class SocketProcess implements Runnable{
     private ArrayBlockingQueue<String> mainMsgQueue;
     private ArrayBlockingQueue<String> socketProcessMsgQueue;
     private Map<Integer, Integer> loggedUsersMap;
+    private Map<TimerTypeName, Thread> runningTimersMap;
 
     private BufferedReader input;
     private PrintWriter output;
     private UserContext userContext;
     private final Integer socketProcessId;
     private ISocketProcessState currentState = null;
-    private Thread noResponseTimer;
+
     public boolean IS_RUNNING;
 
     public SocketProcess(DbHandler dbHandler,
@@ -44,14 +51,44 @@ public class SocketProcess implements Runnable{
         this.loggedUsersMap = loggedUsersMap;
         this.socketProcessMsgQueue = socketProcessMsgQueue;
         this.mainMsgQueue = mainMsgQueue;
-        this.noResponseTimer = new Thread(new NoResponseTimerThread(socketProcessId, socketProcessMsgQueue));
+        this.runningTimersMap = new HashMap<>();
         this.IS_RUNNING = true;
         setState(new SocketNoUserState(this));
     }
 
+    public void startTimer(TimerTypeData timerTypeData){
+        Thread newTimer = new Thread(new ServerTimer(
+                timerTypeData, this.socketProcessId, this.socketProcessMsgQueue));
+        runningTimersMap.put(timerTypeData.getTimerType(), newTimer);
+        newTimer.start();
+    }
+
+    public void stopTimer(TimerTypeName timerType){
+        Thread timerToStopThread = runningTimersMap.get(timerType);
+        if(timerToStopThread != null){
+            timerToStopThread.interrupt();
+            try{
+                timerToStopThread.join();
+            }
+            catch (InterruptedException ex){
+                LOGGER.warning("Exception thrown while stopTimer: " + ex.toString());
+            }
+            runningTimersMap.remove(timerType);
+            LOGGER.fine(timerType + " for socketProcessId: " + this.socketProcessId + " stop");
+        }
+    }
+
+    public void resetTimer(TimerTypeName timerType){
+        Thread timerToStopThread = runningTimersMap.get(timerType);
+        if(timerToStopThread != null){
+            timerToStopThread.interrupt();
+        }
+    }
+
+
     @Override
     public void run(){
-        noResponseTimer.start();
+        startTimer(TimerType.NoResponseTimer);
         while(IS_RUNNING){
             sleepWithExceptionHandle(500);
             tryEnqueueMsgFromClient();
@@ -224,25 +261,25 @@ public class SocketProcess implements Runnable{
         }
     }
 
-    public void resetNoResponseTimer(){
-        noResponseTimer.interrupt();
-    }
-
     public void handleConvInitReq(String[] msgFromClient){
-        UserContext requestedUserContext = dbHandler.getUserContextForUsername(msgFromClient[1]);
-        if(requestedUserContext == null){
+        UserContext reqUserContext = dbHandler.getUserContextForUsername(msgFromClient[1]);
+        if(reqUserContext == null || reqUserContext.getUserId() == userContext.getUserId()){
             sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + ConvInitStatus.UserNotExist);
             return;
         }
-        else if(!loggedUsersMap.containsKey(requestedUserContext.getUserId())){
+        else if(!loggedUsersMap.containsKey(reqUserContext.getUserId())){
             sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + ConvInitStatus.UserNotLogged);
             return;
         }
-        sendMsgToMainServer(MsgTypes.IntConvInitReqMsg + "_" +
-                            requestedUserContext.getUserId() + "_" +
-                            this.userContext.getUserId() + "_" +
-                            this.socketProcessId);
+        sendMsgToMainServer(buildIntConvInitReqMsg(reqUserContext.getUserId()));
         setState(new SocketWaitForConvAcceptState(this));
+    }
+
+    private String buildIntConvInitReqMsg(int toUserId){
+        return MsgTypes.IntConvInitReqMsg + "_" +
+                toUserId + "_" +
+                this.userContext.getUserId() + "_" +
+                this.socketProcessId;
     }
 
     public void handleIntConvInitRespMsg(String[] msgFromMainQueue){
