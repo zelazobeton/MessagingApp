@@ -16,17 +16,20 @@ public class ClientMgrWaitForLogoutRespState extends IClientMgrState {
         LOGGER.fine("Client received: " + msgFromServer[0] +
                     " in state " + this.getClass().getSimpleName());
         switch (msgFromServer[0]) {
-            case MsgTypes.LogoutRespMsg:
-                System.out.println("You have successfully logged out");
+            case MsgTypes.LogoutInd:
+                System.out.println("You have been logged out");
                 super.clientMgr.setState(new ClientMgrIdleState(super.clientMgr));
                 break;
             default:
-                return;
+                super.clientMgr.defaultLoggedClientMsgHandler(msgFromServer);
         }
     }
 
     @Override
     protected void handleUserInput(String userInput) {
-        return;
+        switch (userInput){
+            default:
+                System.out.println("Incorrect input");
+        }
     }
 }

@@ -174,7 +174,7 @@ public class ClientMgr {
     }
 
     public boolean handleConversationResp(String[] msgFromServer){
-        if(msgFromServer[1] != "OK"){
+        if(msgFromServer[1] != BaseStatus.OK){
             System.out.println("No such user or something went wrong");
             setState(new ClientMgrLoggedInState(this));
             return false;
@@ -185,17 +185,28 @@ public class ClientMgr {
 
     public void handleConvInitFailure(String[] msgFromServer){
         switch (msgFromServer[1]){
-            case "UserNotExist":
+            case ConvInitStatus.UserNotExist:
                 System.out.println("No such user");
                 break;
-            case "UserNotLogged":
+            case ConvInitStatus.UserNotLogged:
                 System.out.println("Requested user is not logged in");
                 break;
-            case "UserBusy":
+            case ConvInitStatus.UserBusy:
                 System.out.println("Requested user is busy");
                 break;
             default:
                 System.out.println("Internal error. Please try again");
+                break;
+        }
+    }
+
+    public void defaultLoggedClientMsgHandler(String[] msgFromServer){
+        switch (msgFromServer[0]){
+            case MsgTypes.LogoutInd:
+                System.out.println("You have been logged out");
+                setState(new ClientMgrIdleState(this));
+                break;
+            default:
                 break;
         }
     }

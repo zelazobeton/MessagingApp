@@ -17,7 +17,7 @@ public class ClientMgrIdleState extends IClientMgrState {
                 " in state " + this.getClass().getSimpleName());
         switch (msgFromServer[0]) {
             default:
-                return;
+                break;
         }
     }
 

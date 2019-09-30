@@ -15,22 +15,16 @@ public class ClientMgrWaitForDeleteUserRespState extends IClientMgrState {
     protected void handleMsgFromServer(String[] msgFromServer) {
         LOGGER.fine("Client received: " + msgFromServer[0] +
                 " in state " + this.getClass().getSimpleName());
-        try {
-            switch (msgFromServer[0]) {
-                case MsgTypes.DeleteUserSuccessInd:
-                    super.clientMgr.setState(new ClientMgrIdleState(super.clientMgr));
-                    break;
-                case MsgTypes.DeleteUserFailInd:
-                    System.out.println("Something went wrong");
-                    super.clientMgr.setState(new ClientMgrLoggedInState(super.clientMgr));
-                    break;
-                default:
-                    return;
-            }
-        }
-        catch (IllegalArgumentException ex){
-            LOGGER.warning(ex.toString());
-            ex.printStackTrace();
+        switch (msgFromServer[0]) {
+            case MsgTypes.DeleteUserSuccessInd:
+                super.clientMgr.setState(new ClientMgrIdleState(super.clientMgr));
+                break;
+            case MsgTypes.DeleteUserFailInd:
+                System.out.println("Something went wrong");
+                super.clientMgr.setState(new ClientMgrLoggedInState(super.clientMgr));
+                break;
+            default:
+                super.clientMgr.defaultLoggedClientMsgHandler(msgFromServer);
         }
     }
 

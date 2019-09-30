@@ -22,7 +22,7 @@ public abstract class ISocketProcessState {
             case MsgTypes.ClientLiveConnectionInd:
                 socketProcess.resetNoResponseTimer();
                 break;
-            case MsgTypes.NoResponseTimerExpired:
+            case MsgTypes.IntNoResponseTimerExpired:
                 socketProcess.logoutUser();
                 socketProcess.IS_RUNNING = false;
                 break;

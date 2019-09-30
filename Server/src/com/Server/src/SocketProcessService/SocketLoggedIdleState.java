@@ -25,7 +25,7 @@ public class SocketLoggedIdleState extends ISocketProcessState {
                 break;
             case MsgTypes.LogoutReqMsg:
                 super.socketProcess.logoutUser();
-                super.socketProcess.sendMsgToClient(MsgTypes.LogoutRespMsg);
+                super.socketProcess.sendMsgToClient(MsgTypes.LogoutInd);
                 super.socketProcess.setState(new SocketNoUserState(super.socketProcess));
                 break;
             case MsgTypes.ClientExitInd:

@@ -237,11 +237,11 @@ public class SocketProcess implements Runnable{
     public void handleConvInitReq(String[] msgFromClient){
         UserContext requestedUserContext = dbHandler.getUserContextForUsername(msgFromClient[1]);
         if(requestedUserContext == null){
-            sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + "UserNotExist");
+            sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + ConvInitStatus.UserNotExist);
             return;
         }
         else if(!loggedUsersMap.containsKey(requestedUserContext.getUserId())){
-            sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + "UserNotLogged");
+            sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + ConvInitStatus.UserNotLogged);
             return;
         }
         sendMsgToMainServer(MsgTypes.IntConvInitReqMsg + "_" +
@@ -253,11 +253,11 @@ public class SocketProcess implements Runnable{
 
     public void handleIntConvInitRespMsg(String[] msgFromMainQueue){
         switch (msgFromMainQueue[5]){
-            case "NotOK":
+            case BaseStatus.NotOK:
                 sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + msgFromMainQueue[6]);
                 setState(new SocketLoggedIdleState(this));
                 break;
-            case "OK":
+            case BaseStatus.OK:
                 sendMsgToClient(MsgTypes.ConvInitSuccessInd);
                 setState(new SocketConversationState(this));
                 break;
@@ -269,13 +269,13 @@ public class SocketProcess implements Runnable{
     public void ignoreIntConvInitReqMsg(String[] msgInParts){
         String ignoreReason;
         if(!isRequestedUserLogged(Integer.parseInt(msgInParts[1]))){
-            ignoreReason = "UserNotLogged";
+            ignoreReason = ConvInitStatus.UserNotLogged;
         }
         else{
-            ignoreReason = "UserBusy";
+            ignoreReason = ConvInitStatus.UserBusy;
         }
         String toSendIntConvInitRespMsg = IntMsgBuilder.buildIntConvInitResp(
-                msgInParts[2], msgInParts[3], msgInParts[1], String.valueOf(this.socketProcessId), "NotOK", ignoreReason);
+                msgInParts[2], msgInParts[3], msgInParts[1], String.valueOf(this.socketProcessId), BaseStatus.NotOK, ignoreReason);
         sendMsgToMainServer(toSendIntConvInitRespMsg);
     }
 

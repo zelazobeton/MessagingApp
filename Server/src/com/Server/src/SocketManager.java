@@ -179,22 +179,22 @@ public class SocketManager {
         Integer toUserId = Integer.parseInt(recMsg[1]);
         Integer respUserSocketId = loggedUsersMap.get(toUserId);
         if(respUserSocketId == null){
-            LOGGER.fine("Main queue handle recMsg fail: UserNotLogged");
-            SendIntRouteFailInd(Integer.parseInt(recMsg[3]), "UserNotLogged");
+            LOGGER.fine("Main queue routing fail: User not logged");
+            SendIntRouteFailInd(Integer.parseInt(recMsg[3]), ConvInitStatus.UserNotLogged);
             return;
         }
         ArrayBlockingQueue<String> respUserSocketProcessMsgQueue = messageQueuesMap.get(respUserSocketId);
         if(respUserSocketProcessMsgQueue == null){
-            LOGGER.fine("Main queue handle recMsg fail: NoMsgQueueInMap");
-            SendIntRouteFailInd(Integer.parseInt(recMsg[3]), "Unspecified");
+            LOGGER.fine("Main queue routing fail: No requested msgQueue");
+            SendIntRouteFailInd(Integer.parseInt(recMsg[3]), ConvInitStatus.Unspecified);
             return;
         }
         try{
             respUserSocketProcessMsgQueue.put(joinMsgInParts(recMsg));
         }
         catch (InterruptedException ex){
-            LOGGER.fine("Main queue handle recMsg fail: MsgQueuePutException: " + ex.toString());
-            SendIntRouteFailInd(Integer.parseInt(recMsg[3]), "Unspecified");
+            LOGGER.warning("Main queue routing fail: MsgQueue exception " + ex.toString());
+            SendIntRouteFailInd(Integer.parseInt(recMsg[3]), ConvInitStatus.Unspecified);
         }
     }
 
@@ -210,44 +210,29 @@ public class SocketManager {
                 LOGGER.warning(ex.toString());
             }
         }
-        LOGGER.fine("Main queue handle IntConvInitReqMsg error handling fail");
-    }
-
-    private void sendFailIntConvInitRespMsg(Integer toUserId, String msg){
-        Integer toUserSocketId = loggedUsersMap.get(toUserId);
-        if(toUserSocketId != null){
-            ArrayBlockingQueue<String> toUserSocketProcessMsgQueue = messageQueuesMap.get(toUserSocketId);
-            if(toUserSocketProcessMsgQueue != null){
-                try{
-                    toUserSocketProcessMsgQueue.put(msg);
-                    return;
-                }
-                catch (InterruptedException ex){
-                    ex.printStackTrace();
-                }
-            }
-        }
-        LOGGER.fine("Main queue handle IntConvInitReqMsg error handling fail");
+        LOGGER.fine("Main queue error handling fail");
     }
 
     private void handleIntConvInitRespMsg(String[] recMsg){
         Integer toUserId = Integer.parseInt(recMsg[1]);
         Integer respUserSocketId = loggedUsersMap.get(toUserId);
         if(respUserSocketId == null){
-            SendIntRouteFailInd(Integer.parseInt(recMsg[4]), "UserNotLogged");
+            LOGGER.fine("Main queue routing fail: User not logged");
+            SendIntRouteFailInd(Integer.parseInt(recMsg[4]), ConvInitStatus.UserNotLogged);
             return;
         }
         ArrayBlockingQueue<String> respUserSocketProcessMsgQueue = messageQueuesMap.get(respUserSocketId);
         if(respUserSocketProcessMsgQueue == null){
-            SendIntRouteFailInd(Integer.parseInt(recMsg[4]), "NoMsgQueueInMap");
+            LOGGER.fine("Main queue routing fail: No requested msgQueue");
+            SendIntRouteFailInd(Integer.parseInt(recMsg[4]), ConvInitStatus.Unspecified);
             return;
         }
         try{
             respUserSocketProcessMsgQueue.put(joinMsgInParts(recMsg));
         }
         catch (InterruptedException ex){
-            LOGGER.warning(ex.toString());
-            SendIntRouteFailInd(Integer.parseInt(recMsg[4]), "MsgQueuePutException");
+            LOGGER.warning("Main queue routing fail: MsgQueue exception " + ex.toString());
+            SendIntRouteFailInd(Integer.parseInt(recMsg[4]), ConvInitStatus.Unspecified);
         }
     }
 

@@ -16,7 +16,7 @@ public class ClientMgrConversationState extends IClientMgrState {
                 " in state " + this.getClass().getSimpleName());
         switch (msgFromServer[0]) {
             default:
-                return;
+                super.clientMgr.defaultLoggedClientMsgHandler(msgFromServer);
         }
     }
 
@@ -26,6 +26,5 @@ public class ClientMgrConversationState extends IClientMgrState {
             default:
                 System.out.println("Incorrect input");
         }
-        return;
     }
 }

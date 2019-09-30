@@ -16,12 +16,15 @@ public class ClientMgrWaitForConversationStartResp extends IClientMgrState {
         LOGGER.fine("Client received: " + msgFromServer[0] +
                 " in state " + this.getClass().getSimpleName());
         switch (msgFromServer[0]) {
+            case MsgTypes.ConvInitSuccessInd:
+                super.clientMgr.setState(new ClientMgrConversationState(super.clientMgr));
+                break;
             case MsgTypes.ConvInitFailInd:
                 super.clientMgr.handleConvInitFailure(msgFromServer);
                 super.clientMgr.setState(new ClientMgrLoggedInState(super.clientMgr));
                 break;
             default:
-                return;
+                super.clientMgr.defaultLoggedClientMsgHandler(msgFromServer);
         }
     }
 
@@ -31,6 +34,5 @@ public class ClientMgrWaitForConversationStartResp extends IClientMgrState {
             default:
                 System.out.println("Incorrect input");
         }
-        return;
     }
 }

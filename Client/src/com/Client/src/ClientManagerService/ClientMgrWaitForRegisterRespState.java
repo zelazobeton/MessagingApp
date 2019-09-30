@@ -25,13 +25,16 @@ public class ClientMgrWaitForRegisterRespState extends IClientMgrState {
                 super.clientMgr.setState(new ClientMgrIdleState(super.clientMgr));
                 break;
             default:
-                return;
+                break;
         }
     }
 
     @Override
     protected void handleUserInput(String userInput) {
-        return;
+        switch (userInput){
+            default:
+                System.out.println("Incorrect input");
+        }
     }
 
 }

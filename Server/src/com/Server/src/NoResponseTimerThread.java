@@ -36,7 +36,7 @@ public class NoResponseTimerThread implements Runnable {
     private void expireTimer(){
         try{
             LOGGER.fine("NoResponseTimer for socketProcessId: " + socketProcessId + " expired");
-            messageQueue.put(MsgTypes.NoResponseTimerExpired);
+            messageQueue.put(MsgTypes.IntNoResponseTimerExpired);
             TIMER_RUNNING = false;
         }
         catch (InterruptedException ex) {

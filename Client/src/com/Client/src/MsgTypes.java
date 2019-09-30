@@ -9,8 +9,8 @@ public class MsgTypes {
     public static final String RegisterSuccessInd = "RegisterSuccessInd";
     public static final String RegisterFailInd = "RegisterFailInd";
 
-    public static final String LogoutRespMsg = "LogoutRespMsg";
     public static final String LogoutReqMsg = "LogoutReqMsg";
+    public static final String LogoutInd = "LogoutInd";
     public static final String ClientExitInd = "ClientExitInd";
 
     public static final String DeleteUserReqMsg = "DeleteUserReqMsg";
@@ -20,5 +20,6 @@ public class MsgTypes {
     public static final String ClientLiveConnectionInd = "ClientLiveConnectionInd";
 
     public static final String ConvInitReqMsg = "ConvInitReqMsg";
+    public static final String ConvInitSuccessInd = "ConvInitSuccessInd";
     public static final String ConvInitFailInd = "ConvInitFailInd";
 }
