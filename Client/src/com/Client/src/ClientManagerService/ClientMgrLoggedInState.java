@@ -16,31 +16,22 @@ public class ClientMgrLoggedInState extends IClientMgrState {
         LOGGER.fine("Client received: " + msgFromServer[0] +
                 " in state " + this.getClass().getSimpleName());
         switch (msgFromServer[0]) {
-            default:
-                super.clientMgr.defaultLoggedClientMsgHandler(msgFromServer);
+            case MsgTypes.Interface:
+                super.clientMgr.printUserInterface(msgFromServer);
+                break;
+            case MsgTypes.LogoutInd:
+                System.out.println(msgFromServer[1]);
+                super.clientMgr.setState(new ClientMgrIdleState(super.clientMgr));
+                break;
+            case MsgTypes.ServerInfoMsg:
+                System.out.println(msgFromServer.toString());
+                System.out.print(msgFromServer[1]);
+                break;
         }
     }
 
     @Override
     protected void handleUserInput(String userInput) {
-        switch (userInput){
-            case "start":
-                super.clientMgr.handleConverstationReq();
-                super.clientMgr.setState(new ClientMgrWaitForConversationStartResp(super.clientMgr));
-                break;
-            case "logout":
-                super.clientMgr.sendMsgToServer(MsgTypes.LogoutReqMsg);
-                super.clientMgr.setState(new ClientMgrWaitForLogoutRespState(super.clientMgr));
-                break;
-            case "delete":
-                super.clientMgr.sendMsgToServer(MsgTypes.DeleteUserReqMsg);
-                super.clientMgr.setState(new ClientMgrWaitForDeleteUserRespState(super.clientMgr));
-                break;
-            case "exit":
-                super.clientMgr.sendMsgToServer(MsgTypes.ClientExitInd);
-                System.exit(0);
-            default:
-                System.out.println("Incorrect input");
-        }
+        super.clientMgr.sendMsgToServer(MsgTypes.ClientMsg + "_" + userInput);
     }
 }

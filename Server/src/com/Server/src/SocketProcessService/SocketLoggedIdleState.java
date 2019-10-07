@@ -2,6 +2,8 @@ package com.Server.src.SocketProcessService;
 
 import com.Server.src.LoggerSingleton;
 import com.Server.src.MsgTypes;
+import com.Server.src.ServerTimers.TimerTypeName;
+
 import java.util.logging.Logger;
 
 public class SocketLoggedIdleState extends ISocketProcessState {
@@ -17,23 +19,17 @@ public class SocketLoggedIdleState extends ISocketProcessState {
                     " handle: " + msgInParts[0] +
                     " in state " + this.getClass().getSimpleName());
         switch (msgInParts[0]){
-            case MsgTypes.ConvInitReqMsg:
-                super.socketProcess.handleConvInitReq(msgInParts);
+            case MsgTypes.ClientMsg:
+                super.socketProcess.handleClientMsgInLoggedInState(msgInParts);
                 break;
             case MsgTypes.IntConvInitReqMsg:
-                super.socketProcess.ignoreIntConvInitReqMsg(msgInParts);
+                super.socketProcess.handleIncomingConversationInLoggedInState(msgInParts);
                 break;
-            case MsgTypes.LogoutReqMsg:
-                super.socketProcess.logoutUser();
-                super.socketProcess.sendMsgToClient(MsgTypes.LogoutInd);
-                super.socketProcess.setState(new SocketNoUserState(super.socketProcess));
-                break;
-            case MsgTypes.ClientExitInd:
-                super.socketProcess.logoutUser();
-                socketProcess.finishSocketProcess();
-                break;
-            case MsgTypes.DeleteUserReqMsg:
-                super.socketProcess.handleDeleteUserReq();
+            case MsgTypes.TimerExpired:
+                if(TimerTypeName.valueOf(msgInParts[1]) == TimerTypeName.NoResponseTimer){
+                    socketProcess.logoutUser();
+                    socketProcess.finishSocketProcess();
+                }
                 break;
             default:
                 defaultMsgHandler(msgInParts);

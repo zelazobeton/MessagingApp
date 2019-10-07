@@ -159,56 +159,9 @@ public class ClientMgr {
         }
     }
 
-    public void handleConverstationReq(){
-        stringBuilder.append(MsgTypes.ConvInitReqMsg);
-        stringBuilder.append("_");
-        String userInput;
-        inputFromUserBuffer.clear();
-        System.out.println("Who do you want to talk to?\nEnter username: ");
-        while ((userInput = tryGetUserInput()) == null){
-            sleepWithExceptionHandle(200);
-        }
-        stringBuilder.append(userInput);
-        sendMsgToServer(stringBuilder.toString());
-        stringBuilder.setLength(0);
-    }
-
-    public boolean handleConversationResp(String[] msgFromServer){
-        if(msgFromServer[1] != BaseStatus.OK){
-            System.out.println("No such user or something went wrong");
-            setState(new ClientMgrLoggedInState(this));
-            return false;
-        }
-        setState(new ClientMgrConversationState(this));
-        return true;
-    }
-
-    public void handleConvInitFailure(String[] msgFromServer){
-        switch (msgFromServer[1]){
-            case ConvInitStatus.UserNotExist:
-                System.out.println("No such user");
-                break;
-            case ConvInitStatus.UserNotLogged:
-                System.out.println("Requested user is not logged in");
-                break;
-            case ConvInitStatus.UserBusy:
-                System.out.println("Requested user is busy");
-                break;
-            default:
-                System.out.println("Internal error. Please try again");
-                break;
-        }
-    }
-
-    public void defaultLoggedClientMsgHandler(String[] msgFromServer){
-        switch (msgFromServer[0]){
-            case MsgTypes.LogoutInd:
-                System.out.println("You have been logged out");
-                setState(new ClientMgrIdleState(this));
-                break;
-            default:
-                break;
+    public void printUserInterface(String[] msgFromServer){
+        for(int idx = 1; idx < msgFromServer.length; idx++){
+            System.out.println(msgFromServer[idx]);
         }
     }
 }
-

@@ -14,3 +14,10 @@ exit
 ClientMgrConversationState
 Type messages and press enter to send them:
 
+SocketWaitForConvInitRespState
+cancel (to cancel conversation request)
+
+
+SocketWaitForClientConvAcceptState
+yes (accept)
+no (reject)

@@ -2,14 +2,33 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="46c09216-0889-4e43-9eea-67987c15b073" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/ServerTimers/ServerTimer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MessageDocumentation.txt" beforeDir="false" afterPath="$PROJECT_DIR$/MessageDocumentation.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interfaceOptionsToBuild.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgr.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgr.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrConversationState.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrIdleState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrIdleState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrLoggedInState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrLoggedInState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrWaitForConversationStartResp.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrWaitForDeleteUserRespState.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrWaitForLoginRespState.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrWaitForLogoutRespState.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/ClientManagerService/ClientMgrWaitForRegisterRespState.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/InterfaceMapBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/InterfaceMapBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/LoggerSingleton.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/LoggerSingleton.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/MsgTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/MsgTypes.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/Client/src/UserInputThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/Client/src/UserInputThread.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/ConvInitStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/ConvInitStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/IntMsgBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/IntMsgBuilder.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/MsgTypes.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/MsgTypes.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/NoResponseTimerThread.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/ServerTimers/TimerType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/ServerTimers/TimerType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/ISocketProcessState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/ISocketProcessState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketConversationState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketConversationState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketLoggedIdleState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketLoggedIdleState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketNoUserState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketNoUserState.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketProcess.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketProcess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketWaitForConvAcceptState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketWaitForConvAcceptState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketWaitForConvAcceptState.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Server/src/com/Server/src/SocketProcessService/SocketWaitForConvInitRespState.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,7 +66,7 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4" value="" />
     <property name="create.test.in.the.same.root" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Server" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">

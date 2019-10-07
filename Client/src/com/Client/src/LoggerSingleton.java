@@ -47,12 +47,9 @@ public class LoggerSingleton {
             if(record.getLevel() == Level.WARNING){
                 System.out.println(ANSI_RED + "WARNING: " + record.getMessage());
             }
-            else if(record.getLevel() == Level.INFO){
-                System.out.println(ANSI_YELLOW + "INFO: " + record.getMessage());
-            }
-            else{
-                System.out.println(ANSI_GREEN + "DEBUG: " + record.getMessage());
-            }
+//            else{
+//                System.out.println(ANSI_GREEN + "DEBUG: " + record.getMessage());
+//            }
         }
 
         @Override

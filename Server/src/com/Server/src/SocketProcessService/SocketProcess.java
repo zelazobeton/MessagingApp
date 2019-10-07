@@ -5,14 +5,13 @@ import com.Server.src.ServerTimers.ServerTimer;
 import com.Server.src.ServerTimers.TimerTypeData;
 import com.Server.src.ServerTimers.TimerTypeName;
 import com.Server.src.ServerTimers.TimerType;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 
@@ -30,8 +29,11 @@ public class SocketProcess implements Runnable{
     private UserContext userContext;
     private final Integer socketProcessId;
     private ISocketProcessState currentState = null;
-
+    private Map<String, String> interfaceMap;
     public boolean IS_RUNNING;
+
+    public String convUserId;
+    public String convUserSocketId;
 
     public SocketProcess(DbHandler dbHandler,
                          BufferedReader input,
@@ -53,7 +55,8 @@ public class SocketProcess implements Runnable{
         this.mainMsgQueue = mainMsgQueue;
         this.runningTimersMap = new HashMap<>();
         this.IS_RUNNING = true;
-        setState(new SocketNoUserState(this));
+        this.interfaceMap = InterfaceMapBuilder.build();
+        resetConvUser();
     }
 
     public void startTimer(TimerTypeData timerTypeData){
@@ -88,6 +91,7 @@ public class SocketProcess implements Runnable{
 
     @Override
     public void run(){
+        setState(new SocketNoUserState(this));
         startTimer(TimerType.NoResponseTimer);
         while(IS_RUNNING){
             sleepWithExceptionHandle(500);
@@ -153,7 +157,7 @@ public class SocketProcess implements Runnable{
             }
             userContext = null;
         }
-        sendMsgToClient(MsgTypes.LoginFailInd);
+        sendMsgToClient(MsgTypes.ServerInfoMsg + "_" + "Login failed. Incorrect username or password");
     }
 
     private boolean addUserToLoggedUsersMap(int userId){
@@ -184,17 +188,18 @@ public class SocketProcess implements Runnable{
         String hash = (new PasswordAuthentication()).hash(msgInParts[2].toCharArray());
         if(dbHandler.insertUser(msgInParts[1], hash)){
             LOGGER.fine("Register for: " + msgInParts[1] + " hash: " + hash + " successed");
-            sendMsgToClient(MsgTypes.RegisterSuccessInd);
+            sendMsgToClient(MsgTypes.ServerInfoMsg + "_You have registered correctly. You can now log in.");
         }
         else {
             LOGGER.fine("Register for: " + msgInParts[1] + " hash: " + hash + " failed");
-            sendMsgToClient(MsgTypes.RegisterFailInd);
+            sendMsgToClient(MsgTypes.ServerInfoMsg + "_Register failed. User exists or something else went wrong");
         }
     }
 
     public void logoutUser() {
         removeUserFromLoggedUsersMap(userContext.getUserId());
         userContext = null;
+        resetConvUser();
     }
 
 
@@ -233,11 +238,13 @@ public class SocketProcess implements Runnable{
 
     public void handleDeleteUserReq() {
         if(!dbHandler.deleteUser(userContext.getUsername())){
-            sendMsgToClient(MsgTypes.DeleteUserFailInd);
+            sendMsgToClient(MsgTypes.ServerInfoMsg +
+                            "_" +
+                            "User not deleted, something went wrong");
             return;
         }
         logoutUser();
-        sendMsgToClient(MsgTypes.DeleteUserSuccessInd);
+        sendMsgToClient(MsgTypes.LogoutInd + "_" + "User successfully deleted");
         setState(new SocketNoUserState(this));
     }
 
@@ -262,34 +269,44 @@ public class SocketProcess implements Runnable{
     }
 
     public void handleConvInitReq(String[] msgFromClient){
-        UserContext reqUserContext = dbHandler.getUserContextForUsername(msgFromClient[1]);
+        if(msgFromClient.length < 2){
+            sendMsgToClient(MsgTypes.ServerInfoMsg + "_" +
+                    "Conversation start failed: " + ConvInitStatus.Unspecified);
+            return;
+        }
+        UserContext reqUserContext = dbHandler.getUserContextForUsername(msgFromClient[2]);
         if(reqUserContext == null || reqUserContext.getUserId() == userContext.getUserId()){
-            sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + ConvInitStatus.UserNotExist);
+            sendMsgToClient(MsgTypes.ServerInfoMsg + "_" +
+                            "Conversation start failed: " + ConvInitStatus.UserNotExist);
             return;
         }
         else if(!loggedUsersMap.containsKey(reqUserContext.getUserId())){
-            sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + ConvInitStatus.UserNotLogged);
+            sendMsgToClient(MsgTypes.ServerInfoMsg + "_" +
+                            "Conversation start failed: " + ConvInitStatus.UserNotLogged);
             return;
         }
-        sendMsgToMainServer(buildIntConvInitReqMsg(reqUserContext.getUserId()));
-        setState(new SocketWaitForConvAcceptState(this));
+        convUserId = String.valueOf(reqUserContext.getUserId());
+        sendMsgToClient(MsgTypes.ServerInfoMsg + "_" +
+                "Waiting for response from user");
+        sendMsgToMainServer(IntMsgBuilder.buildIntConvInitReqMsg(reqUserContext.getUserId(),
+                                                                 userContext.getUserId(),
+                                                                 socketProcessId));
+        setState(new SocketWaitForConvInitRespState(this));
     }
 
-    private String buildIntConvInitReqMsg(int toUserId){
-        return MsgTypes.IntConvInitReqMsg + "_" +
-                toUserId + "_" +
-                this.userContext.getUserId() + "_" +
-                this.socketProcessId;
-    }
-
-    public void handleIntConvInitRespMsg(String[] msgFromMainQueue){
-        switch (msgFromMainQueue[5]){
+    public void handleIntConvInitRespMsg(String[] msg){
+        switch (msg[5]){
             case BaseStatus.NotOK:
-                sendMsgToClient(MsgTypes.ConvInitFailInd + "_" + msgFromMainQueue[6]);
+                sendMsgToClient(MsgTypes.ServerInfoMsg + "_" +
+                                "Conversation start failed: " + msg[6]);
                 setState(new SocketLoggedIdleState(this));
+                resetConvUser();
                 break;
             case BaseStatus.OK:
-                sendMsgToClient(MsgTypes.ConvInitSuccessInd);
+                convUserId = msg[3];
+                convUserSocketId = msg[4];
+                sendMsgToClient(MsgTypes.ServerInfoMsg + "_" +
+                        "Conversation started with: " + msg[3]);
                 setState(new SocketConversationState(this));
                 break;
             default:
@@ -297,16 +314,16 @@ public class SocketProcess implements Runnable{
         }
     }
 
-    public void ignoreIntConvInitReqMsg(String[] msgInParts){
+    public void ignoreIntConvInitReqMsg(String[] msg){
         String ignoreReason;
-        if(!isRequestedUserLogged(Integer.parseInt(msgInParts[1]))){
+        if(!isRequestedUserLogged(Integer.parseInt(msg[1]))){
             ignoreReason = ConvInitStatus.UserNotLogged;
         }
         else{
             ignoreReason = ConvInitStatus.UserBusy;
         }
         String toSendIntConvInitRespMsg = IntMsgBuilder.buildIntConvInitResp(
-                msgInParts[2], msgInParts[3], msgInParts[1], String.valueOf(this.socketProcessId), BaseStatus.NotOK, ignoreReason);
+                msg[3], msg[4], msg[1], socketProcessId, BaseStatus.NotOK, ignoreReason);
         sendMsgToMainServer(toSendIntConvInitRespMsg);
     }
 
@@ -315,5 +332,149 @@ public class SocketProcess implements Runnable{
             return false;
         }
         return this.userContext.getUserId() == reqUserId;
+    }
+
+    public void sendConvFinishInd(){
+        String toSendIntConvFinishInd = IntMsgBuilder.buildIntConvFinishInd(
+                convUserId, convUserSocketId, userContext.getUserId(), socketProcessId);
+        LOGGER.fine(toSendIntConvFinishInd);
+        sendMsgToMainServer(toSendIntConvFinishInd);
+        resetConvUser();
+    }
+
+    public void handleConvFinish(String[] convFinishMsg){
+        if (convFinishMsg[3].equals(convUserId)){
+            resetConvUser();
+            sendMsgToClient(MsgTypes.ServerInfoMsg + "_" + "conversation finished");
+        }
+        LOGGER.fine("SocketProcess: " + getSocketProcessId() +
+                " received IntConvFinishInd with wrong userId: " + convFinishMsg[3]);
+    }
+
+    public void resetConvUser(){
+        convUserId = null;
+        convUserSocketId = null;
+    }
+
+    private boolean isCorrectLength(String[] msg){
+        if(msg.length == 1){
+            return false;
+        }
+        LOGGER.fine("SocketProcess: " + getSocketProcessId() +
+                " handle: " + msg[1] +
+                " in state " + currentState.getClass().getSimpleName());
+        return true;
+    }
+
+    public void handleClientMsgInConversationState(String[] convUserMsg){
+        if(!isCorrectLength(convUserMsg)){
+            return;
+        }
+        switch (convUserMsg[1]){
+            case MsgTypes.ConvFinishCmd:
+                sendConvFinishInd();
+                setState(new SocketLoggedIdleState(this));
+                break;
+            case MsgTypes.ExitCmd:
+                sendConvFinishInd();
+                logoutUser();
+                finishSocketProcess();
+                break;
+            default:
+                sendMsgToMainServer(IntMsgBuilder.buildIntConvUserMsg(
+                        convUserId, convUserSocketId, userContext.getUserId(), socketProcessId, convUserMsg[1]));
+        }
+    }
+
+    public void handleClientMsgInLoggedInState(String[] clientMsg){
+        if(!isCorrectLength(clientMsg)){
+            return;
+        }
+
+        switch (clientMsg[1]){
+            case MsgTypes.ExitCmd:
+                logoutUser();
+                finishSocketProcess();
+                break;
+            case MsgTypes.DeleteUserCmd:
+                handleDeleteUserReq();
+                break;
+            case MsgTypes.LogoutCmd:
+                logoutUser();
+                sendMsgToClient(MsgTypes.LogoutInd + "_You have successfully logged out");
+                setState(new SocketNoUserState(this));
+                break;
+            case MsgTypes.ConvInitCmd:
+                handleConvInitReq(clientMsg);
+                break;
+        }
+    }
+
+    public void handleMsgFromAnotherUser(String[] msgInParts){
+        if(Integer.parseInt(msgInParts[1]) != userContext.getUserId()){
+            LOGGER.warning("SocketProcess: " + getSocketProcessId() +
+                            " user logged: " + userContext.getUsername() +
+                            " received msg directed to: " + msgInParts[1]);
+            return;
+        }
+        sendMsgToClient(MsgTypes.ServerInfoMsg + "_" + msgInParts[1] + ": " + msgInParts[5]);
+    }
+
+    public void handleIncomingConversationInLoggedInState(String[] msgInParts){
+        if(!isRequestedUserLogged(Integer.parseInt(msgInParts[1]))){
+            String toSendIntConvInitRespMsg = IntMsgBuilder.buildIntConvInitResp(
+                    msgInParts[3], msgInParts[4], msgInParts[1], socketProcessId, BaseStatus.NotOK, ConvInitStatus.UserNotLogged);
+            sendMsgToMainServer(toSendIntConvInitRespMsg);
+            return;
+        }
+        convUserId = msgInParts[3];
+        convUserSocketId = msgInParts[4];
+        setState(new SocketWaitForClientConvAcceptState(this));
+    }
+
+    public void handleClientMsgInWaitForClientConvAcceptState(String[] clientMsg){
+        if(!isCorrectLength(clientMsg)){
+            return;
+        }
+        String toSendIntConvInitRespMsg;
+        switch (clientMsg[1]){
+            case "yes":
+                toSendIntConvInitRespMsg = IntMsgBuilder.buildIntConvInitResp(
+                        convUserId, convUserSocketId, userContext.getUserId(), socketProcessId, BaseStatus.OK);
+                sendMsgToMainServer(toSendIntConvInitRespMsg);
+                setState(new SocketConversationState(this));
+                break;
+            case "no":
+                toSendIntConvInitRespMsg = IntMsgBuilder.buildIntConvInitResp(
+                        convUserId, convUserSocketId, String.valueOf(userContext.getUserId()), socketProcessId, BaseStatus.NotOK, ConvInitStatus.UserRefused);
+                sendMsgToMainServer(toSendIntConvInitRespMsg);
+                setState(new SocketLoggedIdleState(this));
+                break;
+        }
+    }
+
+    public void handleClientMsgInWaitForConvInitRespState(String[] clientMsg){
+        if(!isCorrectLength(clientMsg)){
+            return;
+        }
+
+        switch (clientMsg[1]){
+            case "cancel":
+                String msg = IntMsgBuilder.buildCancelProcedureMsg(
+                        convUserId, userContext.getUserId(), socketProcessId);
+                sendMsgToMainServer(msg);
+                setState(new SocketLoggedIdleState(this));
+                break;
+        }
+    }
+
+
+
+    public void sendStateUserInterfaceToClient(String interfaceId){
+        if(!interfaceMap.containsKey(interfaceId)){
+            return;
+        }
+        String userInterfaceString = interfaceMap.get(interfaceId);
+        sendMsgToClient(MsgTypes.Interface + "_" + userInterfaceString);
     }
 }

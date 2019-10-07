@@ -12,32 +12,35 @@ public class ClientMgrIdleState extends IClientMgrState {
     }
 
     @Override
-    protected void handleMsgFromServer(String[] msgFromServer){
+    protected void handleMsgFromServer(String[] msgFromServer) {
         LOGGER.fine("Client received: " + msgFromServer[0] +
                 " in state " + this.getClass().getSimpleName());
         switch (msgFromServer[0]) {
-            default:
+            case MsgTypes.LoginSuccessInd:
+                System.out.println("You are now logged in");
+                super.clientMgr.setState(new ClientMgrLoggedInState(super.clientMgr));
+                break;
+            case MsgTypes.ServerInfoMsg:
+                System.out.println(msgFromServer[1]);
                 break;
         }
     }
 
     @Override
     protected void handleUserInput(String userInput) {
-        switch(userInput){
+        switch (userInput) {
             case "login":
                 super.clientMgr.prepareAndSendLoginRespMsg();
-                super.clientMgr.setState(new ClientMgrWaitForLoginRespState(super.clientMgr));
                 break;
             case "register":
                 super.clientMgr.prepareAndSendRegisterReqMsg();
-                super.clientMgr.setState(new ClientMgrWaitForRegisterRespState(super.clientMgr));
                 break;
             case "exit":
                 super.clientMgr.sendMsgToServer(MsgTypes.ClientExitInd);
                 super.clientMgr.sleepWithExceptionHandle(500);
                 System.exit(0);
             default:
-                System.out.println("Incorrect input");
+                System.out.println("Incorrect command");
         }
     }
 }

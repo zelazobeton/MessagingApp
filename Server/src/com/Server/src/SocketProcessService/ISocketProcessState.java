@@ -15,6 +15,7 @@ public abstract class ISocketProcessState {
         LOGGER.fine("SocketProcess: " +
                 socketProcess.getSocketProcessId() +
                 " set to " + this.getClass().getSimpleName());
+        this.socketProcess.sendStateUserInterfaceToClient(this.getClass().getSimpleName());
     }
 
     protected abstract void handleMsgFromSocketProcessQueue(String[] msgFromClient);
@@ -24,13 +25,10 @@ public abstract class ISocketProcessState {
             case MsgTypes.ClientLiveConnectionInd:
                 socketProcess.resetTimer(TimerTypeName.NoResponseTimer);
                 break;
-            case MsgTypes.TimerExpired:
-                if(msgFromQueue[1].equals(TimerTypeName.NoResponseTimer)){
-                    socketProcess.logoutUser();
-                    socketProcess.IS_RUNNING = false;
-                }
-                break;
             default:
+                LOGGER.fine("SocketProcess: " + socketProcess.getSocketProcessId() +
+                        " ignored: " + msgFromQueue[0] +
+                        " in state " + this.getClass().getSimpleName());
                 break;
         }
     }

@@ -18,7 +18,7 @@ public class UserInputThread implements Runnable {
     public void run() {
         LOGGER.fine("User input thread started");
         while(true){
-            String userInput = scanner.next();
+            String userInput = scanner.nextLine();
             queueInput(userInput);
         }
     }
