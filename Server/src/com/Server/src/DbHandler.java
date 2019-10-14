@@ -1,12 +1,12 @@
 package com.Server.src;
 
+import java.io.File;
 import java.sql.*;
 import java.util.logging.Logger;
 
 public class DbHandler {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-
-    public static final String CONNECTION = "jdbc:sqlite:E:\\Java Intellij Projects\\TextFileCommunicator\\";
+    public static final String CONNECTION = "jdbc:sqlite:" + new File("").getAbsolutePath() + File.separator; //local sqlite db
     public static final String DATABASE = "communicator.db";
     public static final String TABLE_USERS = "users";
 
@@ -18,11 +18,11 @@ public class DbHandler {
             "CREATE TABLE IF NOT EXISTS " + TABLE_USERS + " ( " +
             COLUMN_USER_ID + " INTEGER PRIMARY KEY, " +
             COLUMN_USER_NAME + " VARCHAR(50) NOT NULL, " +
-                    COLUMN_USER_HASH + " VARCHAR(50) NOT NULL )";
+            COLUMN_USER_HASH + " VARCHAR(50) NOT NULL )";
 
     public static final String INSERT_USER =
             "INSERT INTO " + TABLE_USERS + " (" + COLUMN_USER_NAME + ", " +
-                    COLUMN_USER_HASH + " ) VALUES(?, ?)";
+            COLUMN_USER_HASH + " ) VALUES(?, ?)";
 
     public static final String QUERY_USER_FOR_USERNAME =
             "SELECT " + COLUMN_USER_ID + ", " + COLUMN_USER_NAME + ", " + COLUMN_USER_HASH +
