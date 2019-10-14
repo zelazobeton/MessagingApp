@@ -7,3 +7,5 @@ On the server side each client has its corresponding thread implemented in the S
 Threads communicate with each other using message queue in main thread. 
 Messages are implemented as string literals with fields separated with underscores.
 Fields of each message are described in MessageFieldDocumentation.txt
+
+Purpose of the project was to train using plain java: multithreading, sql db handling, oop.
