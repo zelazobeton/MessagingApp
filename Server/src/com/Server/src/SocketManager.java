@@ -2,7 +2,7 @@ package com.Server.src;
 
 import com.Server.src.Constants.CC;
 import com.Server.src.Constants.ConvInitStatus;
-import com.Server.src.Constants.MsgTypes;
+import com.Server.src.Constants.SMsgTypes;
 import com.Server.src.SocketProcessService.SocketProcess;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,16 +60,16 @@ public class SocketManager {
         }
         LOGGER.fine("SocketManager handle: " + mainQueueMsg[CC.MSG_ID]);
         switch (mainQueueMsg[CC.MSG_ID]) {
-            case MsgTypes.IntSocketProcessExit:
+            case SMsgTypes.IntSocketProcessExit:
                 handleIntSocketProcessExit(mainQueueMsg);
                 break;
-            case MsgTypes.IntConvInitReqMsg:
-            case MsgTypes.IntCancelProcMsg:
+            case SMsgTypes.IntConvInitReqMsg:
+            case SMsgTypes.IntCancelProcMsg:
                 routeMsgByUserId(mainQueueMsg);
                 break;
-            case MsgTypes.IntConvInitRespMsg:
-            case MsgTypes.IntConvFinishInd:
-            case MsgTypes.IntConvUserMsg:
+            case SMsgTypes.IntConvInitRespMsg:
+            case SMsgTypes.IntConvFinishInd:
+            case SMsgTypes.IntConvUserMsg:
                 routeMsgBySocketProcessId(mainQueueMsg);
                 break;
         }
@@ -193,7 +193,7 @@ public class SocketManager {
     }
 
     private void SendIntRouteFailInd(Integer toUserSocketId, String reason){
-        String msg = MsgTypes.IntRouteFailInd + "_" + reason;
+        String msg = SMsgTypes.IntRouteFailInd + "_" + reason;
         ArrayBlockingQueue<String> toUserSocketProcessMsgQueue = messageQueuesMap.get(toUserSocketId);
         if(toUserSocketProcessMsgQueue != null){
             try{

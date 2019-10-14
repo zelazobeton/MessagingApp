@@ -1,6 +1,6 @@
 package com.Server.src;
 
-import com.Server.src.Constants.MsgTypes;
+import com.Server.src.Constants.SMsgTypes;
 
 public class IntMsgBuilder {
     public static String buildIntConvInitResp(String toUserId,
@@ -9,7 +9,7 @@ public class IntMsgBuilder {
                                               Integer fromUserSocketId,
                                               String status,
                                               String reason){
-        return MsgTypes.IntConvInitRespMsg + "_" +
+        return SMsgTypes.IntConvInitRespMsg + "_" +
                 toUserId + "_" + toUserSocketId + "_" +
                 fromUserId + "_" + fromUserSocketId + "_" +
                 status + "_" + reason;
@@ -20,7 +20,7 @@ public class IntMsgBuilder {
                                               Integer fromUserId,
                                               Integer fromUserSocketId,
                                               String status){
-        return MsgTypes.IntConvInitRespMsg + "_" +
+        return SMsgTypes.IntConvInitRespMsg + "_" +
                 toUserId + "_" + toUserSocketId + "_" +
                 fromUserId + "_" + fromUserSocketId + "_" +
                 status;
@@ -30,7 +30,7 @@ public class IntMsgBuilder {
                                                String toUserSocketId,
                                                Integer fromUserId,
                                                Integer fromUserSocketId){
-        return MsgTypes.IntConvFinishInd + "_" +
+        return SMsgTypes.IntConvFinishInd + "_" +
                 toUserId + "_" + toUserSocketId + "_" +
                 fromUserId + "_" + fromUserSocketId;
     }
@@ -40,7 +40,7 @@ public class IntMsgBuilder {
                                              Integer fromUserId,
                                              Integer fromUserSocketId,
                                              String msgContent){
-        return MsgTypes.IntConvUserMsg + "_" +
+        return SMsgTypes.IntConvUserMsg + "_" +
                 toUserId + "_" + toUserSocketId + "_" +
                 fromUserId + "_" + fromUserSocketId + "_" +
                 msgContent;
@@ -49,7 +49,7 @@ public class IntMsgBuilder {
     public static String buildIntConvInitReqMsg(final Integer toUserId,
                                                 final Integer fromUserId,
                                                 final Integer fromUserSocketId){
-        return MsgTypes.IntConvInitReqMsg + "_" +
+        return SMsgTypes.IntConvInitReqMsg + "_" +
                 toUserId + "_" +
                 "NULL" + "_" +
                 fromUserId + "_" +
@@ -59,7 +59,7 @@ public class IntMsgBuilder {
     public static String buildCancelProcedureMsg(final String toUserId,
                                                  final Integer fromUserId,
                                                  final Integer fromUserSocketId){
-        return MsgTypes.IntCancelProcMsg + "_" +
+        return SMsgTypes.IntCancelProcMsg + "_" +
                 toUserId + "_" +
                 "NULL" + "_" +
                 fromUserId + "_" +

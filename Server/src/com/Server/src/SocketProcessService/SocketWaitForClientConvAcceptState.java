@@ -2,7 +2,7 @@ package com.Server.src.SocketProcessService;
 
 import com.Server.src.Constants.CC;
 import com.Server.src.LoggerSingleton;
-import com.Server.src.Constants.MsgTypes;
+import com.Server.src.Constants.SMsgTypes;
 import com.Server.src.ServerTimers.TimerTypeName;
 
 import java.util.logging.Logger;
@@ -12,7 +12,7 @@ public class SocketWaitForClientConvAcceptState extends ISocketProcessState {
 
     public SocketWaitForClientConvAcceptState(SocketProcess socketProcess) {
         super(socketProcess);
-        super.socketProcess.sendMsgToClient(MsgTypes.ServerInfoMsg + "_" +
+        super.socketProcess.sendMsgToClient(SMsgTypes.ServerInfoMsg + "_" +
                 "Do you accept conversation request from:" + super.socketProcess.convUserId + "?");
     }
 
@@ -22,13 +22,13 @@ public class SocketWaitForClientConvAcceptState extends ISocketProcessState {
                 " handle: " + msgInParts[CC.MSG_ID] +
                 " in state " + this.getClass().getSimpleName());
         switch (msgInParts[CC.MSG_ID]){
-            case MsgTypes.ClientMsg:
+            case SMsgTypes.ClientMsg:
                 super.socketProcess.handleClientMsgInWaitForClientConvAcceptState(msgInParts);
                 break;
-            case MsgTypes.IntConvInitReqMsg:
+            case SMsgTypes.IntConvInitReqMsg:
                 super.socketProcess.ignoreIntConvInitReqMsg(msgInParts);
                 break;
-            case MsgTypes.TimerExpired:
+            case SMsgTypes.TimerExpired:
                 if(TimerTypeName.valueOf(msgInParts[CC.TIMER_TYPE]) == TimerTypeName.NoResponseTimer){
                     socketProcess.sendConvFinishInd();
                     socketProcess.logoutUser();

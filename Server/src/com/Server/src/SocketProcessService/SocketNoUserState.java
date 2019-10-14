@@ -2,7 +2,7 @@ package com.Server.src.SocketProcessService;
 
 import com.Server.src.Constants.CC;
 import com.Server.src.LoggerSingleton;
-import com.Server.src.Constants.MsgTypes;
+import com.Server.src.Constants.SMsgTypes;
 import com.Server.src.ServerTimers.TimerTypeName;
 
 import java.util.logging.Logger;
@@ -20,16 +20,16 @@ public class SocketNoUserState extends ISocketProcessState {
                     " handle: " + msgInParts[CC.MSG_ID] +
                     " in state " + this.getClass().getSimpleName());
         switch (msgInParts[CC.MSG_ID]){
-            case MsgTypes.LoginRespMsg:
-                super.socketProcess.handleLoginRespMsg(msgInParts);
+            case SMsgTypes.LoginReqMsg:
+                super.socketProcess.handleLoginReqMsg(msgInParts);
                 break;
-            case MsgTypes.RegisterReqMsg:
+            case SMsgTypes.RegisterReqMsg:
                 super.socketProcess.handleRegisterReqMsg(msgInParts);
                 break;
-            case MsgTypes.ClientExitInd:
+            case SMsgTypes.ClientExitInd:
                 super.socketProcess.finishSocketProcess();
                 break;
-            case MsgTypes.TimerExpired:
+            case SMsgTypes.TimerExpired:
                 if(TimerTypeName.valueOf(msgInParts[CC.TIMER_TYPE]) == TimerTypeName.NoResponseTimer){
                     socketProcess.finishSocketProcess();
                 }

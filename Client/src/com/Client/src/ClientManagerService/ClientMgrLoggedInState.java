@@ -1,7 +1,8 @@
 package com.Client.src.ClientManagerService;
 
+import com.Client.src.CC;
 import com.Client.src.LoggerSingleton;
-import com.Client.src.MsgTypes;
+import com.Client.src.CMsgTypes;
 import java.util.logging.Logger;
 
 public class ClientMgrLoggedInState extends IClientMgrState {
@@ -13,24 +14,24 @@ public class ClientMgrLoggedInState extends IClientMgrState {
 
     @Override
     protected void handleMsgFromServer(String[] msgFromServer) {
-        LOGGER.fine("Client received: " + msgFromServer[0] +
+        LOGGER.fine("Client received: " + msgFromServer[CC.MSG_ID] +
                 " in state " + this.getClass().getSimpleName());
-        switch (msgFromServer[0]) {
-            case MsgTypes.Interface:
-                super.clientMgr.printUserInterface(msgFromServer);
+        switch (msgFromServer[CC.MSG_ID]) {
+            case CMsgTypes.Interface:
+                clientMgr.printServerMsg(msgFromServer);
                 break;
-            case MsgTypes.LogoutInd:
-                System.out.println(msgFromServer[1]);
-                super.clientMgr.setState(new ClientMgrIdleState(super.clientMgr));
+            case CMsgTypes.LogoutInd:
+                System.out.println(msgFromServer[CC.MSG_CONTENT]);
+                clientMgr.setState(new ClientMgrIdleState(clientMgr));
                 break;
-            case MsgTypes.ServerInfoMsg:
-                System.out.print(msgFromServer[1]);
+            case CMsgTypes.ServerInfoMsg:
+                System.out.print(msgFromServer[CC.MSG_CONTENT]);
                 break;
         }
     }
 
     @Override
     protected void handleUserInput(String userInput) {
-        super.clientMgr.sendMsgToServer(MsgTypes.ClientMsg + "_" + userInput);
+        clientMgr.sendMsgToServer(CMsgTypes.ClientMsg + "_" + userInput);
     }
 }

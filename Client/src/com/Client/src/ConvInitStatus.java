@@ -1,8 +1,0 @@
-package com.Client.src;
-
-public class ConvInitStatus {
-    public static final String UserNotExist = "UserNotExist";
-    public static final String UserNotLogged = "UserNotLogged";
-    public static final String UserBusy = "UserBusy";
-    public static final String Unspecified = "Unspecified";
-}

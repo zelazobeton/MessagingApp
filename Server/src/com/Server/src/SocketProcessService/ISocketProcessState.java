@@ -2,7 +2,7 @@ package com.Server.src.SocketProcessService;
 
 import com.Server.src.Constants.CC;
 import com.Server.src.LoggerSingleton;
-import com.Server.src.Constants.MsgTypes;
+import com.Server.src.Constants.SMsgTypes;
 import com.Server.src.ServerTimers.TimerTypeName;
 
 import java.util.logging.Logger;
@@ -23,7 +23,7 @@ public abstract class ISocketProcessState {
 
     protected void defaultMsgHandler(String[] msgFromQueue){
         switch (msgFromQueue[CC.MSG_ID]){
-            case MsgTypes.ClientLiveConnectionInd:
+            case SMsgTypes.ClientLiveConnectionInd:
                 socketProcess.resetTimer(TimerTypeName.NoResponseTimer);
                 break;
             default:

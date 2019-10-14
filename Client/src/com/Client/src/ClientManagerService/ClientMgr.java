@@ -14,7 +14,7 @@ public class ClientMgr {
     private BufferedReader serverReader;
     private ArrayBlockingQueue<String> inputFromUserBuffer;
     private PrintWriter clientWriter;
-    private StringBuilder stringBuilder;
+    StringBuilder stringBuilder;
     private Thread userInputThread;
     private Map<String, List<String>> interfaceMap;
     private Integer cycleCounter;
@@ -37,53 +37,32 @@ public class ClientMgr {
         while(true){
             tryHandleUserInput();
             tryHandleMsgFromServer();
-            sendLiveConnInd();
+            sendClientLiveConnInd();
 
             sleepWithExceptionHandle(500);
         }
     }
 
-    private void sendLiveConnInd(){
+    private void sendClientLiveConnInd(){
         if((cycleCounter % 80) == 0){
-            sendMsgToServer(MsgTypes.ClientLiveConnectionInd);
+            sendMsgToServer(CMsgTypes.ClientLiveConnectionInd);
         }
         cycleCounter++;
     }
 
-    public void prepareAndSendLoginRespMsg(){
-        stringBuilder.append(MsgTypes.LoginRespMsg);
-        stringBuilder.append("_");
-        appendCredentialsToStringBuilder();
-        sendMsgToServer(stringBuilder.toString());
-        stringBuilder.setLength(0);
-    }
-
-    public void prepareAndSendRegisterReqMsg(){
-        stringBuilder.append(MsgTypes.RegisterReqMsg);
-        stringBuilder.append("_");
-        appendCredentialsToStringBuilder();
-        sendMsgToServer(stringBuilder.toString());
-        stringBuilder.setLength(0);
-    }
-
-    private void appendCredentialsToStringBuilder(){
-        String userInput;
+    void handleLoginReq(){
+        stringBuilder.append(CMsgTypes.LoginReqMsg);
+        setState(new ClientMgrUserCredentialsInputState(this));
         inputFromUserBuffer.clear();
-        System.out.println("Enter username: ");
-        while ((userInput = tryGetUserInput()) == null){
-            sleepWithExceptionHandle(200);
-        }
-        stringBuilder.append(userInput);
-        stringBuilder.append("_");
-
-        System.out.println("Enter password: ");
-        while ((userInput = tryGetUserInput()) == null){
-            sleepWithExceptionHandle(200);
-        }
-        stringBuilder.append(userInput);
     }
 
-    public void printInterface(String interfaceId){
+    void handleRegisterReq(){
+        stringBuilder.append(CMsgTypes.RegisterReqMsg);
+        setState(new ClientMgrUserCredentialsInputState(this));
+        inputFromUserBuffer.clear();
+    }
+
+    void printInterface(String interfaceId){
         if(!interfaceMap.containsKey(interfaceId)){
             return;
         }
@@ -93,75 +72,83 @@ public class ClientMgr {
         }
     }
 
-    public String[] tryGetServerMsg() {
+    private String[] tryGetServerMsg() {
         try{
             if(serverReader.ready()){
                 return serverReader.readLine().split("_");
             }
-            return null;
         }
         catch (IOException ex){
             LOGGER.warning(ex.toString());
             ex.printStackTrace();
-            return null;
         }
+        return null;
     }
 
-    protected String tryGetUserInput(){
-        String userInput = null;
+    private String tryGetUserInput(){
         try{
             if(!inputFromUserBuffer.isEmpty()){
-                userInput = inputFromUserBuffer.take();
-                return userInput;
+                return inputFromUserBuffer.take();
             }
-            return null;
         }
         catch (InterruptedException ex){
             LOGGER.warning(ex.toString());
             ex.printStackTrace();
-            return null;
         }
+        return null;
     }
 
-    public void runUserInputThread(){
+    private void runUserInputThread(){
         userInputThread.start();
     }
 
-    public void sleepWithExceptionHandle(Integer millisecondsToSleep){
+    void sleepWithExceptionHandle(Integer millisecondsToSleep){
         try {
             Thread.sleep(millisecondsToSleep);
         } catch (InterruptedException ex) {
-            LOGGER.warning("Thread interrupted");
+            LOGGER.warning("Thread interrupted while sleeping");
         }
     }
 
-    public void setState(IClientMgrState newState){
+    void setState(IClientMgrState newState){
         currentState = newState;
     }
 
-    public void sendMsgToServer(String msg){
+    void sendMsgToServer(String msg){
         LOGGER.fine("Client send: " + msg +
                     " in state: " + currentState.getClass().getSimpleName());
         clientWriter.println(msg);
     }
 
-    public void tryHandleUserInput(){
+    private void tryHandleUserInput(){
         String userInput;
         while ((userInput = tryGetUserInput()) != null){
             currentState.handleUserInput(userInput);
         }
     }
 
-    public void tryHandleMsgFromServer(){
+    private void tryHandleMsgFromServer(){
         String[] msgFromServer = tryGetServerMsg();
         if(msgFromServer != null){
             currentState.handleMsgFromServer(msgFromServer);
         }
     }
 
-    public void printUserInterface(String[] msgFromServer){
+    void printServerMsg(String[] msgFromServer){
         for(int idx = 1; idx < msgFromServer.length; idx++){
             System.out.println(msgFromServer[idx]);
         }
+    }
+
+    void handleUserLoginInput(String userInput){
+        stringBuilder.append("_").append(userInput);
+        inputFromUserBuffer.clear();
+        System.out.println("Enter password: ");
+    }
+
+    void handleUserPwdInput(String userInput){
+        stringBuilder.append("_").append(userInput);
+        sendMsgToServer(stringBuilder.toString());
+        stringBuilder.setLength(0);
     }
 }

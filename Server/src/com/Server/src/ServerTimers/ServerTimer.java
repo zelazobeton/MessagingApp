@@ -1,7 +1,7 @@
 package com.Server.src.ServerTimers;
 
 import com.Server.src.LoggerSingleton;
-import com.Server.src.Constants.MsgTypes;
+import com.Server.src.Constants.SMsgTypes;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 
@@ -46,7 +46,7 @@ public class ServerTimer implements Runnable {
     private void expireTimer(){
         try{
             LOGGER.fine(TimerType + " for socketProcessId: " + socketProcessId + " expired");
-            messageQueue.put(MsgTypes.TimerExpired + "_" + TimerType);
+            messageQueue.put(SMsgTypes.TimerExpired + "_" + TimerType);
             IS_RESETABLE = false;
         }
         catch (InterruptedException ex) {

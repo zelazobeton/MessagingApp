@@ -1,7 +1,6 @@
 package com.Client.src;
 
 import com.Client.src.ClientManagerService.ClientMgr;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Logger;
@@ -9,6 +8,7 @@ import java.util.logging.Logger;
 public class ConnectionManager {
     private Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
     private final Integer CONNECTION_PORT;
+    private final Integer CONNECTION_TIMEOUT = 5000;
     private final String HOST;
     private Socket socket;
 
@@ -18,11 +18,11 @@ public class ConnectionManager {
         this.socket = null;
     }
 
-    public void run(){
+    void run(){
         try{
             connectToSocket();
             ClientMgr clientMgr = new ClientMgr(socket.getInputStream(),
-                                                            socket.getOutputStream());
+                                                socket.getOutputStream());
 
             clientMgr.run();
         }
@@ -36,7 +36,7 @@ public class ConnectionManager {
         while(true){
             try{
                 socket = new Socket(HOST, CONNECTION_PORT);
-                socket.setSoTimeout(5000);
+                socket.setSoTimeout(CONNECTION_TIMEOUT);
                 LOGGER.fine("Socket successfully created");
                 return;
             }
@@ -54,7 +54,7 @@ public class ConnectionManager {
                 LOGGER.warning("Socket closed");
             }
         } catch (Exception ex){
-            LOGGER.warning("No socket to close");
+            LOGGER.warning("Error while closing socket: No socket to close");
         }
     }
 }

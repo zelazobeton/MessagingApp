@@ -29,7 +29,7 @@ public class UserInputThread implements Runnable {
                 inputFromUserBuffer.put(userInput);
             }
             catch (InterruptedException ex) {
-                LOGGER.warning(ex.toString());
+                LOGGER.warning("User input thread error: " + ex.toString());
                 ex.printStackTrace();
             }
         }

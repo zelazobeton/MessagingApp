@@ -1,15 +1,20 @@
 package com.Server.src.Constants;
 
-public class MsgTypes {
+public class SMsgTypes {
     //Client communication messages:
     public static final String ClientMsg = "ClientMsg";
     public static final String Interface = "Interface";
     public static final String ServerInfoMsg = "ServerInfoMsg";
 
-    public static final String LoginRespMsg = "LoginRespMsg";
+    public static final String LoginReqMsg = "LoginReqMsg";
     public static final String LoginSuccessInd = "LoginSuccessInd";
+    public static final String LoginFailInd = "LoginFailInd";;
+    public static final Integer LoginReqLength = 3;
+    public static final Integer UserMsgLength = 2;
 
     public static final String RegisterReqMsg = "RegisterReqMsg";
+    public static final String RegisterRespMsg = "RegisterRespMsg";;
+    public static final Integer RegisterReqLength = 3;
 
     public static final String LogoutCmd = "logout";
     public static final String ExitCmd = "exit";

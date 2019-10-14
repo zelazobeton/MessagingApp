@@ -10,3 +10,6 @@ start_<username> (start conversation with that user)
 logout
 delete (delete user)
 exit
+
+ClientMgrUserCredentialsInputState
+Enter username: 
