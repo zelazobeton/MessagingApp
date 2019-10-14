@@ -16,22 +16,22 @@ public class SocketConversationState extends ISocketProcessState{
 
     @Override
     protected void handleMsgFromSocketProcessQueue(String[] msgInParts){
-        LOGGER.fine("SocketProcess: " + super.socketProcess.getSocketProcessId() +
+        LOGGER.fine("SocketProcess: " + socketProcess.getSocketProcessId() +
                 " handle: " + msgInParts[CC.MSG_ID] +
                 " in state " + this.getClass().getSimpleName());
         switch (msgInParts[CC.MSG_ID]){
             case SMsgTypes.ClientMsg:
-                super.socketProcess.handleClientMsgInConversationState(msgInParts);
+                socketProcess.handleClientMsgInConversationState(msgInParts);
                 break;
             case SMsgTypes.IntConvUserMsg:
-                super.socketProcess.handleMsgFromAnotherUser(msgInParts);
+                socketProcess.handleMsgFromAnotherUser(msgInParts);
                 break;
             case SMsgTypes.IntConvInitReqMsg:
-                super.socketProcess.ignoreIntConvInitReqMsg(msgInParts);
+                socketProcess.ignoreIntConvInitReqMsg(msgInParts);
                 break;
             case SMsgTypes.IntConvFinishInd:
-                super.socketProcess.handleConvFinish(msgInParts);
-                super.socketProcess.setState(new SocketLoggedIdleState(super.socketProcess));
+                socketProcess.handleConvFinish(msgInParts);
+                socketProcess.setState(new SocketLoggedIdleState(socketProcess));
                 break;
             case SMsgTypes.TimerExpired:
                 if(TimerTypeName.valueOf(msgInParts[CC.TIMER_TYPE]) == TimerTypeName.NoResponseTimer){

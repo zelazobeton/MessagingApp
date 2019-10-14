@@ -16,15 +16,15 @@ public class SocketLoggedIdleState extends ISocketProcessState {
 
     @Override
     protected void handleMsgFromSocketProcessQueue(String[] msgInParts){
-        LOGGER.fine("SocketProcess: " + super.socketProcess.getSocketProcessId() +
+        LOGGER.fine("SocketProcess: " + socketProcess.getSocketProcessId() +
                     " handle: " + msgInParts[CC.MSG_ID] +
                     " in state " + this.getClass().getSimpleName());
         switch (msgInParts[CC.MSG_ID]){
             case SMsgTypes.ClientMsg:
-                super.socketProcess.handleClientMsgInLoggedInState(msgInParts);
+                socketProcess.handleClientMsgInLoggedInState(msgInParts);
                 break;
             case SMsgTypes.IntConvInitReqMsg:
-                super.socketProcess.handleIncomingConversationInLoggedInState(msgInParts);
+                socketProcess.handleIncomingConversationInLoggedInState(msgInParts);
                 break;
             case SMsgTypes.TimerExpired:
                 if(TimerTypeName.valueOf(msgInParts[CC.TIMER_TYPE]) == TimerTypeName.NoResponseTimer){

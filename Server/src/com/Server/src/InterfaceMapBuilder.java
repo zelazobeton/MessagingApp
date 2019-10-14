@@ -3,13 +3,14 @@ package com.Server.src;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
 public class InterfaceMapBuilder {
     private static Logger LOGGER = LoggerSingleton.getInstance().LOGGER;
-    private static String INTERFACE_OPTIONS_FILE = "userInterfacesToSendToClient.txt";
+    private static String INTERFACE_OPTIONS_FILE = "userInterfaces.txt";
 
     public static Map<String, String> build(){
         try(BufferedReader br = new BufferedReader(new FileReader(INTERFACE_OPTIONS_FILE))) {
@@ -32,7 +33,7 @@ public class InterfaceMapBuilder {
             line = br.readLine();
             while(!("".equals(line)) && line != null) {
                 stringBuilder.append(line);
-                stringBuilder.append("_");
+                stringBuilder.append('_');
                 line = br.readLine();
             }
             interfaceOptionsMap.put(stateName, stringBuilder.toString());

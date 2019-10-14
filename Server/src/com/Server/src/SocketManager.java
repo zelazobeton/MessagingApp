@@ -45,9 +45,9 @@ public class SocketManager {
             LOGGER.fine("Socket manager finished after preparation failure");
             return;
         }
-
+        int newConnToken = 0;
         while(true){
-            tryOpenNewClientConn();
+            tryOpenNewClientConn(newConnToken);
             tryHandleNextMsgFromMainQueue();
             sleepWithExceptionHandle();
         }
@@ -90,7 +90,7 @@ public class SocketManager {
     private boolean prepareServerSocket() {
         try{
             serverSocket = new ServerSocket(CONNECTION_PORT);
-            serverSocket.setSoTimeout(2000);
+            serverSocket.setSoTimeout(200);
             return true;
         }
         catch (Exception ex){
@@ -117,13 +117,17 @@ public class SocketManager {
         return dbHandler.open();
     }
 
-    private void tryOpenNewClientConn() {
+    private void tryOpenNewClientConn(int newConnToken) {
         try{
-            Socket clientSocket = serverSocket.accept();
-            createAndRunNewSocketProcess(clientSocket);
+            if(newConnToken % 30 == 0){
+                newConnToken = 0;
+                Socket clientSocket = serverSocket.accept();
+                createAndRunNewSocketProcess(clientSocket);
+            }
+            newConnToken++;
         }
         catch (IOException ex){
-//            LOGGER.warning("Error while opening new client connection: " + ex.getMessage());
+//            LOGGER.warning("Exception while trying to open new client connection: " + ex.getMessage());
         }
     }
 
@@ -151,7 +155,7 @@ public class SocketManager {
 
     private void sleepWithExceptionHandle(){
         try {
-            Thread.sleep(200);
+            Thread.sleep(50);
         } catch (InterruptedException ex) {
             LOGGER.info("sleepWithExceptionHandle interrupted: " + ex.toString());
             ex.printStackTrace();

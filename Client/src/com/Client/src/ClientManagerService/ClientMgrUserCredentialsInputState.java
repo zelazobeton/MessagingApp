@@ -24,7 +24,7 @@ public class ClientMgrUserCredentialsInputState extends IClientMgrState {
                 clientMgr.stringBuilder.setLength(0);
                 break;
             case CMsgTypes.LoginFailInd:
-                System.out.println("Login failed. Incorrect username or password");
+                System.out.println("Login failed. Incorrect username or password\n");
                 clientMgr.setState(new ClientMgrIdleState(clientMgr));
                 break;
             case CMsgTypes.RegisterRespMsg:

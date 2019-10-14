@@ -26,6 +26,7 @@ public class ClientMgrLoggedInState extends IClientMgrState {
                 break;
             case CMsgTypes.ServerInfoMsg:
                 System.out.print(msgFromServer[CC.MSG_CONTENT]);
+                System.out.print('\n');
                 break;
         }
     }

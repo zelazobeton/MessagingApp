@@ -1,0 +1,12 @@
+SocketWaitForConvInitRespState
+Waiting for response from user...
+cancel (to cancel conversation request)
+
+SocketLoggedIdleState
+Options:
+start:<username> (start conversation with that user)
+delete (delete user)
+logout
+
+SocketConversationState
+finish: (finish conversation)

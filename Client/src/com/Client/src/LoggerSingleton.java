@@ -2,6 +2,9 @@ package com.Client.src;
 
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.*;
 
 public class LoggerSingleton {
@@ -18,7 +21,9 @@ public class LoggerSingleton {
 
     private static void prepareLogger() {
         try{
-            FileHandler fileHandler = new FileHandler("log.txt");
+            DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
+            Date date = new Date();
+            FileHandler fileHandler = new FileHandler("./logs/CLIENT_" + dateFormat.format(date) + ".log");
             fileHandler.setFormatter(new SimpleFormatter());
             fileHandler.setLevel(Level.ALL);
             LOGGER.addHandler(fileHandler);
@@ -27,7 +32,6 @@ public class LoggerSingleton {
             consoleHandler.setFormatter(new SimpleFormatter());
             consoleHandler.setLevel(Level.ALL);
             LOGGER.addHandler(consoleHandler);
-
 
             LOGGER.setUseParentHandlers(false);
             LOGGER.setLevel(Level.ALL);

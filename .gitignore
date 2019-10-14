@@ -2,3 +2,4 @@
 *log.txt*
 *.db
 *.db-journal
+**/logs

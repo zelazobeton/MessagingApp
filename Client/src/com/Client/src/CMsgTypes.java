@@ -10,7 +10,7 @@ public class CMsgTypes {
     public static final String LoginFailInd = "LoginFailInd";;
 
     public static final String RegisterReqMsg = "RegisterReqMsg";
-    public static final String RegisterRespMsg = "RegisterRespMsg";;
+    public static final String RegisterRespMsg = "RegisterRespMsg";
 
     public static final String LogoutInd = "LogoutInd";
     public static final String ClientExitInd = "ClientExitInd";

@@ -48,12 +48,14 @@ public class IntMsgBuilder {
 
     public static String buildIntConvInitReqMsg(final Integer toUserId,
                                                 final Integer fromUserId,
-                                                final Integer fromUserSocketId){
+                                                final Integer fromUserSocketId,
+                                                final String fromUserUsername){
         return SMsgTypes.IntConvInitReqMsg + "_" +
                 toUserId + "_" +
                 "NULL" + "_" +
                 fromUserId + "_" +
-                fromUserSocketId;
+                fromUserSocketId + "_" +
+                fromUserUsername;
     }
 
     public static String buildCancelProcedureMsg(final String toUserId,

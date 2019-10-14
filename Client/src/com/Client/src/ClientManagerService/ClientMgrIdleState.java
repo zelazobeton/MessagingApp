@@ -23,6 +23,7 @@ public class ClientMgrIdleState extends IClientMgrState {
                 break;
             case CMsgTypes.ServerInfoMsg:
                 System.out.println(msgFromServer[CC.MSG_CONTENT]);
+                System.out.print('\n');
                 break;
         }
     }

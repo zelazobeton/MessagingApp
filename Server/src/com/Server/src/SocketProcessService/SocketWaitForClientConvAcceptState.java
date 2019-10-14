@@ -12,21 +12,28 @@ public class SocketWaitForClientConvAcceptState extends ISocketProcessState {
 
     public SocketWaitForClientConvAcceptState(SocketProcess socketProcess) {
         super(socketProcess);
-        super.socketProcess.sendMsgToClient(SMsgTypes.ServerInfoMsg + "_" +
-                "Do you accept conversation request from:" + super.socketProcess.convUserId + "?");
+        socketProcess.sendMsgToClient(SMsgTypes.Interface + "_" +
+                "Do you accept conversation request from:" +
+                socketProcess.convUserUsername + "?" +
+                "_yes (accept)_no (reject)");
     }
 
     @Override
     protected void handleMsgFromSocketProcessQueue(String[] msgInParts){
-        LOGGER.fine("SocketProcess: " + super.socketProcess.getSocketProcessId() +
+        LOGGER.fine("SocketProcess: " + socketProcess.getSocketProcessId() +
                 " handle: " + msgInParts[CC.MSG_ID] +
                 " in state " + this.getClass().getSimpleName());
         switch (msgInParts[CC.MSG_ID]){
             case SMsgTypes.ClientMsg:
-                super.socketProcess.handleClientMsgInWaitForClientConvAcceptState(msgInParts);
+                socketProcess.handleClientMsgInWaitForClientConvAcceptState(msgInParts);
                 break;
             case SMsgTypes.IntConvInitReqMsg:
-                super.socketProcess.ignoreIntConvInitReqMsg(msgInParts);
+                socketProcess.ignoreIntConvInitReqMsg(msgInParts);
+                break;
+            case SMsgTypes.IntCancelProcMsg:
+                socketProcess.sendMsgToClient(SMsgTypes.ServerInfoMsg + "_Conversation finished by another user");
+                socketProcess.resetConvUser();
+                socketProcess.setState(new SocketLoggedIdleState(socketProcess));
                 break;
             case SMsgTypes.TimerExpired:
                 if(TimerTypeName.valueOf(msgInParts[CC.TIMER_TYPE]) == TimerTypeName.NoResponseTimer){
