@@ -24,7 +24,6 @@ public class ClientMgrLoggedInState extends IClientMgrState {
                 super.clientMgr.setState(new ClientMgrIdleState(super.clientMgr));
                 break;
             case MsgTypes.ServerInfoMsg:
-                System.out.println(msgFromServer.toString());
                 System.out.print(msgFromServer[1]);
                 break;
         }

@@ -1,4 +1,4 @@
-package com.Server.src;
+package com.Server.src.Constants;
 
 public class BaseStatus {
     public static final String OK = "OK";

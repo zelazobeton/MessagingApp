@@ -1,7 +1,9 @@
 package com.Server.src;
 
+import com.Server.src.Constants.CC;
+import com.Server.src.Constants.ConvInitStatus;
+import com.Server.src.Constants.MsgTypes;
 import com.Server.src.SocketProcessService.SocketProcess;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,7 +20,7 @@ public class SocketManager {
     private Integer CONNECTION_PORT;
     private int numOfClientConnectionsCreated;
     private DbHandler dbHandler;
-    private ServerSocket SERVER_SOCKET;
+    private ServerSocket serverSocket;
 
     private StringBuilder stringBuilder;
     private Map<Integer, Integer> loggedUsersMap;
@@ -29,7 +31,7 @@ public class SocketManager {
     public SocketManager(Integer CONNECTION_PORT) {
         this.CONNECTION_PORT = CONNECTION_PORT;
         this.numOfClientConnectionsCreated = 0;
-        this.SERVER_SOCKET = null;
+        this.serverSocket = null;
 
         this.stringBuilder = new StringBuilder();
         this.socketProcessThreadMap = new HashMap<>();
@@ -38,50 +40,48 @@ public class SocketManager {
         this.mainMsgQueue = new ArrayBlockingQueue<>(50);
     }
 
-    public void run() {
+    void run() {
         if(!(prepareServerSocket() && openDatabase())){
-            LOGGER.fine("Socket manager finished run after preparation failure");
+            LOGGER.fine("Socket manager finished after preparation failure");
             return;
         }
 
         while(true){
             tryOpenNewClientConn();
             tryHandleNextMsgFromMainQueue();
-            sleepWithExceptionHandle(1000);
+            sleepWithExceptionHandle();
         }
     }
 
-    public void tryHandleNextMsgFromMainQueue(){
-        String[] msgFromMainQueueInParts = tryGetNextMsgFromMainQueue();
-        if(msgFromMainQueueInParts == null) {
+    private void tryHandleNextMsgFromMainQueue(){
+        String[] mainQueueMsg = tryGetNextMsgFromMainQueue();
+        if(mainQueueMsg == null) {
             return;
         }
-        LOGGER.fine("SocketManager handle: " + msgFromMainQueueInParts[0]);
-        switch (msgFromMainQueueInParts[0]) {
+        LOGGER.fine("SocketManager handle: " + mainQueueMsg[CC.MSG_ID]);
+        switch (mainQueueMsg[CC.MSG_ID]) {
             case MsgTypes.IntSocketProcessExit:
-                handleIntSocketProcessExit(msgFromMainQueueInParts);
+                handleIntSocketProcessExit(mainQueueMsg);
                 break;
             case MsgTypes.IntConvInitReqMsg:
             case MsgTypes.IntCancelProcMsg:
-                routeMsgByUserId(msgFromMainQueueInParts);
+                routeMsgByUserId(mainQueueMsg);
                 break;
             case MsgTypes.IntConvInitRespMsg:
             case MsgTypes.IntConvFinishInd:
             case MsgTypes.IntConvUserMsg:
-                routeMsgBySocketProcessId(msgFromMainQueueInParts);
+                routeMsgBySocketProcessId(mainQueueMsg);
                 break;
-            default:
-                return;
         }
     }
 
-    public String[] tryGetNextMsgFromMainQueue(){
+    private String[] tryGetNextMsgFromMainQueue(){
         if(!mainMsgQueue.isEmpty()){
             try{
                 return mainMsgQueue.take().split("_");
             }
             catch (InterruptedException ex){
-                LOGGER.warning("Exception thrown while tryGetNextMsgFromMainQueue: " + ex.toString());
+                LOGGER.warning("Exception thrown while getting msg from main queue: " + ex.toString());
             }
         }
         return null;
@@ -89,8 +89,8 @@ public class SocketManager {
 
     private boolean prepareServerSocket() {
         try{
-            SERVER_SOCKET = new ServerSocket(CONNECTION_PORT);
-            SERVER_SOCKET.setSoTimeout(2000);
+            serverSocket = new ServerSocket(CONNECTION_PORT);
+            serverSocket.setSoTimeout(2000);
             return true;
         }
         catch (Exception ex){
@@ -101,11 +101,11 @@ public class SocketManager {
     }
 
     private void closeSocket(){
-        if(SERVER_SOCKET == null){
+        if(serverSocket == null){
             return;
         }
         try{
-            SERVER_SOCKET.close();
+            serverSocket.close();
         }
         catch (Exception ex){
             LOGGER.warning("Error while closing SERVER_SOCKET: " + ex.toString());
@@ -119,13 +119,10 @@ public class SocketManager {
 
     private void tryOpenNewClientConn() {
         try{
-            /*LOGGING_CLEAR*/
-//            LOGGER.fine("Try open new client connection");
-            Socket clientSocket = SERVER_SOCKET.accept();
+            Socket clientSocket = serverSocket.accept();
             createAndRunNewSocketProcess(clientSocket);
         }
         catch (IOException ex){
-            /*LOGGING_CLEAR*/
 //            LOGGER.warning("Error while opening new client connection: " + ex.getMessage());
         }
     }
@@ -152,9 +149,9 @@ public class SocketManager {
         newSocketProcess.start();
     }
 
-    private void sleepWithExceptionHandle(Integer millisecondsToSleep){
+    private void sleepWithExceptionHandle(){
         try {
-            Thread.sleep(millisecondsToSleep);
+            Thread.sleep(200);
         } catch (InterruptedException ex) {
             LOGGER.info("sleepWithExceptionHandle interrupted: " + ex.toString());
             ex.printStackTrace();
@@ -166,8 +163,8 @@ public class SocketManager {
         Thread socketProcessThreadToFinish = socketProcessThreadMap.get(socketProcessToFinishId);
         if(socketProcessThreadToFinish == null){
             LOGGER.warning("Error while exiting SocketProcess: " +
-                    socketProcessToFinishId +
-                    " Thread not found in socketProcessThreadMap");
+                            socketProcessToFinishId +
+                            " Thread not found in socketProcessThreadMap");
             return;
         }
         try{
@@ -183,16 +180,16 @@ public class SocketManager {
         LOGGER.fine("SocketProcess: " + socketProcessToFinishId + " removed successfully");
     }
 
-    private void routeMsgByUserId(String[] recMsg){
-        Integer toUserId = Integer.parseInt(recMsg[1]);
-        Integer respUserSocketId = loggedUsersMap.get(toUserId);
-        if(respUserSocketId == null){
-            LOGGER.fine("Main queue routing fail: User not logged");
-            SendIntRouteFailInd(Integer.parseInt(recMsg[3]), ConvInitStatus.UserNotLogged);
+    private void routeMsgByUserId(String[] msg){
+        Integer toUserId = Integer.parseInt(msg[CC.TO_USER_ID]);
+        Integer toUserSocketId = loggedUsersMap.get(toUserId);
+        if(toUserSocketId == null){
+            LOGGER.fine("Main queue routing fail: Requested user not logged");
+            SendIntRouteFailInd(Integer.parseInt(msg[CC.FROM_USER_ID]), ConvInitStatus.UserNotLogged);
             return;
         }
-        recMsg[2] = String.valueOf(respUserSocketId);
-        routeMsgBySocketProcessId(recMsg);
+        msg[CC.TO_USER_SOCKET_ID] = String.valueOf(toUserSocketId);
+        routeMsgBySocketProcessId(msg);
     }
 
     private void SendIntRouteFailInd(Integer toUserSocketId, String reason){
@@ -207,29 +204,29 @@ public class SocketManager {
                 LOGGER.warning(ex.toString());
             }
         }
-        LOGGER.fine("Main queue error handling fail");
+        LOGGER.warning("Main queue exception handling error");
     }
 
-    private void routeMsgBySocketProcessId(String[] recMsg){
-        ArrayBlockingQueue<String> respUserSocketProcessMsgQueue =
-                messageQueuesMap.get(Integer.parseInt(recMsg[2]));
-        if(respUserSocketProcessMsgQueue == null){
-            LOGGER.fine("Main queue fail routing msg: " + recMsg[0] +
-                        " from socketId: " + recMsg[4] +
-                        " to socketId: " + recMsg[2] +
+    private void routeMsgBySocketProcessId(String[] msg){
+        ArrayBlockingQueue<String> toUserSocketProcessMsgQueue =
+                messageQueuesMap.get(Integer.parseInt(msg[CC.TO_USER_SOCKET_ID]));
+        if(toUserSocketProcessMsgQueue == null){
+            LOGGER.fine("Error while routing msg: " + msg[CC.MSG_ID] +
+                        " from socketId: " + msg[CC.FROM_USER_SOCKET_ID] +
+                        " to socketId: " + msg[CC.TO_USER_SOCKET_ID] +
                         " no such queue in messageQueuesMap");
-            SendIntRouteFailInd(Integer.parseInt(recMsg[4]), ConvInitStatus.Unspecified);
+            SendIntRouteFailInd(Integer.parseInt(msg[CC.FROM_USER_SOCKET_ID]), ConvInitStatus.Unspecified);
             return;
         }
         try{
-            respUserSocketProcessMsgQueue.put(joinMsgInParts(recMsg));
+            toUserSocketProcessMsgQueue.put(joinMsgInParts(msg));
         }
         catch (InterruptedException ex){
-            LOGGER.warning("Main queue exception while routing msg: " + recMsg[0] +
-                            " from socketId: " + recMsg[4] +
-                            " to socketId: " + recMsg[2] +
+            LOGGER.warning("Error while routing msg: " + msg[CC.MSG_ID] +
+                            " from socketId: " + msg[CC.FROM_USER_SOCKET_ID] +
+                            " to socketId: " + msg[CC.TO_USER_SOCKET_ID] +
                             ex.toString());
-            SendIntRouteFailInd(Integer.parseInt(recMsg[4]), ConvInitStatus.Unspecified);
+            SendIntRouteFailInd(Integer.parseInt(msg[CC.FROM_USER_SOCKET_ID]), ConvInitStatus.Unspecified);
         }
     }
 

@@ -1,7 +1,7 @@
 package com.Server.src.ServerTimers;
 
 import com.Server.src.LoggerSingleton;
-import com.Server.src.MsgTypes;
+import com.Server.src.Constants.MsgTypes;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Logger;
 

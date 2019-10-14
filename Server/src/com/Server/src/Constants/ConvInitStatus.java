@@ -1,4 +1,4 @@
-package com.Server.src;
+package com.Server.src.Constants;
 
 public class ConvInitStatus {
     public static final String UserNotExist = "UserNotExist";

@@ -1,7 +1,8 @@
 package com.Server.src.SocketProcessService;
 
+import com.Server.src.Constants.CC;
 import com.Server.src.LoggerSingleton;
-import com.Server.src.MsgTypes;
+import com.Server.src.Constants.MsgTypes;
 import com.Server.src.ServerTimers.TimerTypeName;
 
 import java.util.logging.Logger;
@@ -21,13 +22,13 @@ public abstract class ISocketProcessState {
     protected abstract void handleMsgFromSocketProcessQueue(String[] msgFromClient);
 
     protected void defaultMsgHandler(String[] msgFromQueue){
-        switch (msgFromQueue[0]){
+        switch (msgFromQueue[CC.MSG_ID]){
             case MsgTypes.ClientLiveConnectionInd:
                 socketProcess.resetTimer(TimerTypeName.NoResponseTimer);
                 break;
             default:
                 LOGGER.fine("SocketProcess: " + socketProcess.getSocketProcessId() +
-                        " ignored: " + msgFromQueue[0] +
+                        " ignored: " + msgFromQueue[CC.MSG_ID] +
                         " in state " + this.getClass().getSimpleName());
                 break;
         }

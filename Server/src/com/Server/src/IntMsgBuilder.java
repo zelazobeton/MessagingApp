@@ -1,5 +1,7 @@
 package com.Server.src;
 
+import com.Server.src.Constants.MsgTypes;
+
 public class IntMsgBuilder {
     public static String buildIntConvInitResp(String toUserId,
                                               String toUserSocketId,
