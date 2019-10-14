@@ -1,4 +1,4 @@
-MessagingApp
+# MessagingApp
 
 Application is a simple text communicator based on console interface with client and server packages. 
 It operates on local sqlite db with registered users and their logging passwords.
